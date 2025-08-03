@@ -13,14 +13,14 @@ const db = require('./config/database');
 const socket = require('./config/socket');
 
 // Import routes
-// const authRoutes = require('./routes/authRoutes');
-// const userRoutes = require('./routes/userRoutes');
-// const friendRoutes = require('./routes/friendRoutes');
-// const roomRoutes = require('./routes/roomRoutes');
-// const gameRoutes = require('./routes/gameRoutes');
-// const notificationRoutes = require('./routes/notificationRoutes');
-// const analyticsRoutes = require('./routes/analyticsRoutes');
-// const mediaRoutes = require('./routes/mediaRoutes');
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
+const friendRoutes = require('./routes/friendRoutes');
+const roomRoutes = require('./routes/roomRoutes');
+const gameRoutes = require('./routes/gameRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+const mediaRoutes = require('./routes/mediaRoutes');
 
 // Initialize Express app
 const app = express();
@@ -57,14 +57,14 @@ app.use(morgan('combined', { stream: logger.stream })); // HTTP request logging
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // API routes
-// app.use('/api/auth', authRoutes);
-// app.use('/api/users', userRoutes);
-// app.use('/api/friends', friendRoutes);
-// app.use('/api/rooms', roomRoutes);
-// app.use('/api/games', gameRoutes);
-// app.use('/api/notifications', notificationRoutes);
-// app.use('/api/analytics', analyticsRoutes);
-// app.use('/api/media', mediaRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/friends', friendRoutes);
+app.use('/api/rooms', roomRoutes);
+app.use('/api/games', gameRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/media', mediaRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

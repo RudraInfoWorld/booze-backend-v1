@@ -6,7 +6,7 @@ const db = require('../config/database');
 /**
  * Protect routes - Verify that the user is authenticated
  */
-const protect = async (req, res, next) => {
+const authenticate = async (req, res, next) => {
   try {
     // Get token from authorization header
     let token;
@@ -63,7 +63,7 @@ const protect = async (req, res, next) => {
  * Check if user is admin
  * This is just a placeholder - actual admin check would depend on your user roles system
  */
-const restrictTo = (...roles) => {
+const authorize = (...roles) => {
   return async (req, res, next) => {
     try {
       // Get user role from database
@@ -86,6 +86,6 @@ const restrictTo = (...roles) => {
 };
 
 module.exports = {
-  protect,
-  restrictTo
+  authenticate,
+  authorize
 };
