@@ -1,0 +1,39 @@
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 14:45:40"}
+{"level":"error","message":"Database connection failed: ","service":"booze-api","timestamp":"2025-08-03 14:45:40"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 15:18:20"}
+{"level":"error","message":"Database connection failed: Access denied for user 'root'@'localhost' (using password: NO)","service":"booze-api","timestamp":"2025-08-03 15:18:20"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 15:18:51"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 15:18:51"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 15:18:51"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 15:18:51"}
+{"level":"info","message":"::1 - - [03/Aug/2025:09:54:04 +0000] \"GET /health HTTP/1.1\" 200 76 \"-\" \"PostmanRuntime/7.43.0\"","service":"booze-api","timestamp":"2025-08-03 15:24:04"}
+{"level":"info","message":"::1 - - [03/Aug/2025:09:55:03 +0000] \"GET /health HTTP/1.1\" 200 76 \"-\" \"PostmanRuntime/7.43.0\"","service":"booze-api","timestamp":"2025-08-03 15:25:03"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 15:25:43"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 15:25:43"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 15:25:43"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 15:25:43"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 17:04:51"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 17:04:51"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 17:04:51"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 17:04:51"}
+{"level":"info","message":"::1 - - [03/Aug/2025:11:38:57 +0000] \"GET /health HTTP/1.1\" 200 76 \"-\" \"PostmanRuntime/7.45.0\"","service":"booze-api","timestamp":"2025-08-03 17:08:57"}
+{"level":"info","message":"::1 - - [03/Aug/2025:11:40:13 +0000] \"POST /auth/otp/request HTTP/1.1\" 404 49 \"-\" \"PostmanRuntime/7.45.0\"","service":"booze-api","timestamp":"2025-08-03 17:10:13"}
+{"level":"info","message":"::1 - - [03/Aug/2025:11:40:50 +0000] \"POST /api/auth/otp/request HTTP/1.1\" 404 49 \"-\" \"PostmanRuntime/7.45.0\"","service":"booze-api","timestamp":"2025-08-03 17:10:50"}
+{"level":"info","message":"::1 - - [03/Aug/2025:11:49:07 +0000] \"GET /api/users/profile HTTP/1.1\" 404 49 \"-\" \"PostmanRuntime/7.45.0\"","service":"booze-api","timestamp":"2025-08-03 17:19:07"}
+{"level":"info","message":"::1 - - [03/Aug/2025:11:54:40 +0000] \"GET /health HTTP/1.1\" 200 76 \"-\" \"PostmanRuntime/7.45.0\"","service":"booze-api","timestamp":"2025-08-03 17:24:40"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 17:29:12"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 17:29:12"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 17:29:12"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 17:29:12"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 17:29:16"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 17:29:16"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 17:29:16"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 17:29:16"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 17:30:44"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 17:30:44"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 17:30:44"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 17:30:44"}
+{"level":"info","message":"Socket.io server initialized","service":"booze-api","timestamp":"2025-08-03 17:31:31"}
+{"level":"info","message":"Database connection established successfully","service":"booze-api","timestamp":"2025-08-03 17:31:31"}
+{"level":"info","message":"Database setup completed successfully","service":"booze-api","timestamp":"2025-08-03 17:31:31"}
+{"level":"info","message":"Server running in development mode on port 3000","service":"booze-api","timestamp":"2025-08-03 17:31:31"}
