@@ -1,33 +1,9 @@
 const express = require('express');
 const { body } = require('express-validator');
-const multer = require('multer');
 const userController = require('../controllers/userController');
 const { authenticate } = require('../middleware/auth');
-
+const {uploadImage} = require('../middleware/multer')
 const router = express.Router();
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/profile-pictures/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, req.user.id + '-' + uniqueSuffix + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: function (req, file, cb) {
-    // Accept images only
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|avif)$/)) {
-      return cb(new Error('Only image files are allowed!'), false);
-    }
-    cb(null, true);
-  }
-});
 
 /**
  * @route GET /api/users/profile
@@ -84,7 +60,7 @@ router.put(
 router.post(
   '/profile-picture',
   authenticate,
-  upload.single('image'),
+  uploadImage.single('image'),
   userController.uploadProfilePicture
 );
 

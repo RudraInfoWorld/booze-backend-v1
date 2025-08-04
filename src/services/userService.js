@@ -6,6 +6,7 @@ const logger = require('../config/logger');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+const { deleteMediaFromCloudinary } = require('../middleware/cloudinary');
 const unlinkAsync = promisify(fs.unlink);
 
 /**
@@ -158,7 +159,7 @@ const updateProfile = async (userId, updateData) => {
  * @param {Object} file - Uploaded file object
  * @returns {Promise<Object>} - Updated user object
  */
-const uploadProfilePicture = async (userId, file) => {
+const uploadProfilePicture = async (userId, public_id , url) => {
   try {
     // Get current profile picture
     const [user] = await db.query(
@@ -171,20 +172,18 @@ const uploadProfilePicture = async (userId, file) => {
     }
     
     // Delete old profile picture if exists
-    if (user.profile_picture) {
-      const oldPath = path.join(__dirname, '../../', user.profile_picture);
+    if (user.pic_id) {
       try {
-        await unlinkAsync(oldPath);
+        await deleteMediaFromCloudinary(user.pic_id);
       } catch (err) {
         logger.warn(`Could not delete old profile picture: ${err.message}`);
       }
     }
     
     // Set profile picture path in database
-    const dbPath = `uploads/profiles/${file.filename}`;
     await db.query(
-      'UPDATE users SET profile_picture = ? WHERE id = ?',
-      [dbPath, userId]
+      'UPDATE users SET profile_picture = ? , pic_id = ? WHERE id = ?',
+      [url, public_id, userId]
     );
     
     // Return updated user

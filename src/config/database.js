@@ -68,6 +68,7 @@ const setupDatabase = async () => {
         password VARCHAR(255),
         bio TEXT,
         profile_picture VARCHAR(255),
+        pic_id VARCHAR(36),
         interests JSON,
         vibe_preference VARCHAR(50),
         account_status ENUM('active', 'ghost', 'private', 'deleted') DEFAULT 'active',
