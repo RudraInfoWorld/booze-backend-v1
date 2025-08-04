@@ -51,20 +51,6 @@ router.post(
   authController.loginWithPhone
 );
 
-/**
- * @route POST /api/auth/login/social
- * @desc Login with social provider (Google, Apple)
- * @access Public
- */
-router.post(
-  '/login/social',
-  [
-    body('provider').notEmpty().withMessage('Provider is required')
-      .isIn(['google', 'apple']).withMessage('Provider must be google or apple'),
-    body('provider_token').notEmpty().withMessage('Provider token is required')
-  ],
-  authController.loginWithSocial
-);
 
 /**
  * @route POST /api/auth/token/refresh

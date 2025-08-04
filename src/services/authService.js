@@ -89,9 +89,10 @@ const requestOTP = async (phone) => {
       'INSERT INTO otp_codes (id, phone, code, expires_at) VALUES (?, ?, ?, ?)',
       [uuidv4(), phone, otp, expiryTime]
     );
-    
-    // Send OTP via SMS
-    await sendOTP(phone, otp);
+
+    // TODO: Uncomment below line to enable sending OTP via SMS    
+    // // Send OTP via SMS
+    // await sendOTP(phone, otp);
     
     return {
       expiresAt: expiryTime
