@@ -85,7 +85,7 @@ const isUsernameAvailable = async (username) => {
  */
 const updateProfile = async (userId, updateData) => {
   try {
-    const { username, bio, interests, vibe_preference, mode_preference } = updateData;
+    const { username, bio, interests, vibe_preference, mode_preference ,email } = updateData;
     
     // Check if username is being updated and is available
     if (username) {
@@ -127,6 +127,11 @@ const updateProfile = async (userId, updateData) => {
     if (mode_preference) {
       updateFields.push('mode_preference = ?');
       updateValues.push(mode_preference);
+    }
+
+    if(email) {
+      updateFields.push('email = ?');
+      updateValues.push(email);
     }
     
     if (updateFields.length === 0) {

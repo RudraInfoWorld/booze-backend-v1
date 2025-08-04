@@ -72,7 +72,8 @@ const updateProfile = catchAsync(async (req, res) => {
     bio: req.body.bio,
     interests: req.body.interests,
     vibe_preference: req.body.vibe_preference,
-    mode_preference: req.body.mode_preference
+    mode_preference: req.body.mode_preference,
+    email : req.body.email
   };
   
   // Remove undefined fields
