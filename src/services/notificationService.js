@@ -6,7 +6,7 @@ const firebase = require('firebase-admin');
 
 // Initialize Firebase if not already initialized
 let firebaseInitialized = false;
-const initializeFirebase = () => {
+const initializeFirebase = async () => {
   try {
     if (!firebaseInitialized && process.env.NODE_ENV !== 'test') {
       firebase.initializeApp({
@@ -99,7 +99,7 @@ const createNotification = async (notificationData) => {
 const sendPushNotification = async (userId, title, body, type, data) => {
   try {
     // Initialize Firebase if not already initialized
-    initializeFirebase();
+    await initializeFirebase();
     
     if (!firebaseInitialized) {
       logger.warn('Firebase not initialized, skipping push notification');

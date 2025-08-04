@@ -28,6 +28,15 @@ const createRoom = async (roomData) => {
     
     // Create room
     const roomId = uuidv4();
+
+    const isRoomExists = db.query(
+      'SELECT id FROM rooms WHERE host_id = ? and name = ?',
+      [hostId ,name]
+    );
+
+    if (isRoomExists) {
+      throw new AppError('Room with the same name already exists', 400);
+    }
     
     await db.query(
       'INSERT INTO rooms (id, name, type, host_id) VALUES (?, ?, ?, ?)',
@@ -358,8 +367,8 @@ const getPublicRooms = async (filters = {}, limit = 20, offset = 0) => {
     
     // Add pagination
     query += ' LIMIT ? OFFSET ?';
-    params.push(limit, offset);
-    
+    params.push(Number(limit), Number(offset));
+
     // Execute query
     const rooms = await db.query(query, params);
     

@@ -58,7 +58,7 @@ router.put(
  * @access Private
  */
 router.post(
-  '/:room_id/join',
+  '/join/:room_id',
   roomController.joinRoom
 );
 
@@ -68,7 +68,7 @@ router.post(
  * @access Private
  */
 router.post(
-  '/:room_id/leave',
+  '/leave/:room_id',
   roomController.leaveRoom
 );
 
