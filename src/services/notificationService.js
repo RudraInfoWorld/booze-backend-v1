@@ -55,12 +55,21 @@ const createNotification = async (notificationData) => {
     
     // Create notification in database
     const notificationId = uuidv4();
+
+    //  Safety check: is `data` valid JSON?
+    let jsonData;
+    try {
+      jsonData = JSON.stringify(data || {});
+    } catch (jsonError) {
+      logger.error(`Invalid data payload: ${JSON.stringify(data)}`);
+      throw new AppError('Invalid notification data payload', 400);
+    }
     
     await db.query(
       `INSERT INTO notifications 
       (id, user_id, type, title, message, data) 
       VALUES (?, ?, ?, ?, ?, ?)`,
-      [notificationId, userId, type, title, message, JSON.stringify(data || {})]
+      [notificationId, userId, type, title, message, jsonData]
     );
     
     // Get the created notification

@@ -57,7 +57,7 @@ router.put(
  * @desc Join room
  * @access Private
  */
-router.post(
+router.get(
   '/join/:room_id',
   roomController.joinRoom
 );
@@ -67,7 +67,7 @@ router.post(
  * @desc Leave room
  * @access Private
  */
-router.post(
+router.get(
   '/leave/:room_id',
   roomController.leaveRoom
 );
@@ -97,8 +97,8 @@ router.get(
  * @desc Request to join a locked room
  * @access Private
  */
-router.post(
-  '/:room_id/join-request',
+router.get(
+  '/join-request/:room_id',
   roomController.requestJoinRoom
 );
 
