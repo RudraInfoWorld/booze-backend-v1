@@ -64,16 +64,6 @@ router.post(
   userController.uploadProfilePicture
 );
 
-/**
- * @route POST /api/users/ai-avatar
- * @desc Generate AI avatar
- * @access Private
- */
-router.post(
-  '/ai-avatar',
-  authenticate,
-  userController.generateAIAvatar
-);
 
 /**
  * @route PUT /api/users/status

@@ -195,32 +195,6 @@ const uploadProfilePicture = async (userId, public_id , url) => {
 };
 
 /**
- * Generate AI avatar for user
- * @param {string} userId - User ID 
- * @returns {Promise<Object>} - Updated user object
- */
-const generateAIAvatar = async (userId) => {
-  // This is a placeholder function - actual implementation would connect to an AI avatar generation service
-  try {
-    // Placeholder - generate a random avatar file
-    const filename = `/images/avatar.jpg`;
-    const dbPath = `uploads/profiles/${filename}`;
-    
-    // Save avatar path to database
-    await db.query(
-      'UPDATE users SET profile_picture = ? WHERE id = ?',
-      [dbPath, userId]
-    );
-    
-    // Return updated user
-    return getUserById(userId);
-  } catch (error) {
-    logger.error(`Generate AI avatar error: ${error.message}`);
-    throw new AppError('Failed to generate AI avatar', 500);
-  }
-};
-
-/**
  * Update account status (active, ghost, private)
  * @param {string} userId - User ID
  * @param {string} status - New status
@@ -304,7 +278,6 @@ module.exports = {
   isUsernameAvailable,
   updateProfile,
   uploadProfilePicture,
-  generateAIAvatar,
   updateAccountStatus,
   deleteAccount,
   searchUsers
