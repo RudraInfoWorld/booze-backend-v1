@@ -24,7 +24,7 @@ router.get(
  * @access Private
  */
 router.put(
-  '/:notification_id/read',
+  '/read/:notification_id',
   notificationController.markNotificationRead
 );
 

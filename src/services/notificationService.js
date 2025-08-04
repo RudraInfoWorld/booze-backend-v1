@@ -231,9 +231,9 @@ const getUserNotifications = async (userId, limit = 20, offset = 0, unreadOnly =
     if (unreadOnly) {
       query += ' AND is_read = FALSE';
     }
-    
-    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+
+    // Add pagination
+    query += ` ORDER BY created_at DESC LIMIT ${Number(limit)} OFFSET ${Number(offset)}`;
     
     // Get notifications
     const notifications = await db.query(query, params);

@@ -29,12 +29,12 @@ const createRoom = async (roomData) => {
     // Create room
     const roomId = uuidv4();
 
-    const isRoomExists = db.query(
+    const isRoomExists = await db.query(
       'SELECT id FROM rooms WHERE host_id = ? and name = ?',
       [hostId ,name]
     );
 
-    if (isRoomExists) {
+    if (isRoomExists?.length > 0) {
       throw new AppError('Room with the same name already exists', 400);
     }
     
