@@ -1,2 +1,0 @@
-{"level":"error","message":"Database connection failed: ","service":"booze-api","timestamp":"2025-08-03 14:45:40"}
-{"level":"error","message":"Database connection failed: Access denied for user 'root'@'localhost' (using password: NO)","service":"booze-api","timestamp":"2025-08-03 15:18:20"}

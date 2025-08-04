@@ -136,7 +136,6 @@ const updateProfile = async (userId, updateData) => {
     updateQuery += updateFields.join(', ');
     updateQuery += ' WHERE id = ?';
     updateValues.push(userId);
-    
     // Update user
     await db.query(updateQuery, updateValues);
     
@@ -226,7 +225,7 @@ const generateAIAvatar = async (userId) => {
 const updateAccountStatus = async (userId, status) => {
   try {
     // Validate status
-    const validStatuses = ['active', 'ghost', 'private'];
+    const validStatuses = ['active','ghost','private'];
     if (!validStatuses.includes(status)) {
       throw new AppError('Invalid account status', 400);
     }
@@ -279,11 +278,13 @@ const deleteAccount = async (userId) => {
  */
 const searchUsers = async (searchTerm, limit = 10) => {
   try {
+    const safeLimit = Number.isInteger(limit) && limit > 0 ? limit : 10;
+
     const users = await db.query(
       `SELECT id, username, bio, profile_picture FROM users 
       WHERE username LIKE ? AND account_status = 'active' 
-      LIMIT ?`,
-      [`%${searchTerm}%`, limit]
+      LIMIT ${safeLimit}`,
+      [`%${searchTerm}%`]
     );
     
     return users;

@@ -22,7 +22,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: function (req, file, cb) {
     // Accept images only
-    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif|avif)$/)) {
       return cb(new Error('Only image files are allowed!'), false);
     }
     cb(null, true);
@@ -38,17 +38,6 @@ router.get(
   '/profile',
   authenticate,
   userController.getProfile
-);
-
-/**
- * @route GET /api/users/:username
- * @desc Get user by username
- * @access Private
- */
-router.get(
-  '/:username',
-  authenticate,
-  userController.getUserByUsername
 );
 
 /**
@@ -81,7 +70,7 @@ router.put(
     body('vibe_preference').optional()
       .isIn(['chill', 'moderate', 'party']).withMessage('Invalid vibe preference'),
     body('mode_preference').optional()
-      .isIn(['solo', 'social']).withMessage('Invalid mode preference')
+      .isIn(['light', 'dark' , 'party']).withMessage('Invalid mode preference')
   ],
   userController.updateProfile
 );
@@ -119,7 +108,7 @@ router.put(
   authenticate,
   [
     body('status').notEmpty().withMessage('Status is required')
-      .isIn(['active', 'away', 'do_not_disturb', 'invisible']).withMessage('Invalid status')
+      .isIn(['active','ghost','private']).withMessage('Invalid status')
   ],
   userController.updateAccountStatus
 );
@@ -144,6 +133,17 @@ router.get(
   '/search',
   authenticate,
   userController.searchUsers
+);
+
+/**
+ * @route GET /api/users/:username
+ * @desc Get user by username
+ * @access Private
+ */
+router.get(
+  '/:username',
+  authenticate,
+  userController.getUserByUsername
 );
 
 module.exports = router;

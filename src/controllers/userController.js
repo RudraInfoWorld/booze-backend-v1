@@ -100,6 +100,8 @@ const uploadProfilePicture = catchAsync(async (req, res) => {
   if (!req.file) {
     throw new AppError('No file uploaded', 400);
   }
+
+  // TODO: UPLOAD ON CLOUDINARY AND REMOVE FROM LOCAL.
   
   const updatedUser = await userService.uploadProfilePicture(req.user.id, req.file);
   
@@ -169,14 +171,13 @@ const deleteAccount = catchAsync(async (req, res) => {
  * Search users
  */
 const searchUsers = catchAsync(async (req, res) => {
-  const { query } = req.query;
-  const limit = parseInt(req.query.limit) || 10;
+  const { q , limit = 10 } = req.query;
+  const q_limit = parseInt(limit) || 10;
   
-  if (!query) {
+  if (!q) {
     throw new AppError('Search query is required', 400);
   }
-  
-  const users = await userService.searchUsers(query, limit);
+  const users = await userService.searchUsers(q, q_limit);
   
   res.status(200).json({
     status: 'success',
