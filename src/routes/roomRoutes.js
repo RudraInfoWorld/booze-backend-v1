@@ -53,7 +53,7 @@ router.put(
 );
 
 /**
- * @route POST /api/rooms/:room_id/join
+ * @route GET /api/rooms/join/:room_id
  * @desc Join room
  * @access Private
  */
@@ -63,7 +63,7 @@ router.get(
 );
 
 /**
- * @route POST /api/rooms/:room_id/leave
+ * @route GET /api/rooms/leave/:room_id
  * @desc Leave room
  * @access Private
  */

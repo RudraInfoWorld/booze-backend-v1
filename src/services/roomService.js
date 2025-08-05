@@ -151,6 +151,17 @@ const updateRoom = async (roomId, updateData, userId) => {
     if (room.host_id !== userId) {
       throw new AppError('Only the room host can update the room', 403);
     }
+
+    if(updateData?.name) {
+      const isRoomExists = await db.query(
+        `SELECT id FROM rooms WHERE host_id = ? and name like "%${updateData?.name}%"`,
+        [userId ]
+      );
+    
+      if (isRoomExists?.length > 0) {
+        throw new AppError('Room with the same name already exists', 400);
+      }
+    }
     
     // Prepare update query
     let updateQuery = 'UPDATE rooms SET ';
@@ -366,8 +377,7 @@ const getPublicRooms = async (filters = {}, limit = 20, offset = 0) => {
     query += ' ORDER BY participants_count DESC, r.created_at DESC';
     
     // Add pagination
-    query += ' LIMIT ? OFFSET ?';
-    params.push(Number(limit), Number(offset));
+    query += ` LIMIT ${limit} OFFSET ${offset}`;
 
     // Execute query
     const rooms = await db.query(query, params);
