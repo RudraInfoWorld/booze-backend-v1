@@ -719,21 +719,21 @@ const inviteToGame = async (sessionId, inviterId, inviteeId) => {
       "SELECT username FROM users WHERE id = ?",
       [inviterId]
     );
-
+    // TODO : Send notification to addressee
     // Send notification to invitee
-    await notificationService.createNotification({
-      userId: inviteeId,
-      type: "game_invite",
-      title: "Game Invite",
-      message: `${inviterUser.username} invited you to join ${session.game_name}`,
-      data: {
-        sessionId,
-        roomId: session.room_id,
-        gameId: session.game_id,
-        gameName: session.game_name,
-        inviterId,
-      },
-    });
+    // await notificationService.createNotification({
+    //   userId: inviteeId,
+    //   type: "game_invite",
+    //   title: "Game Invite",
+    //   message: `${inviterUser.username} invited you to join ${session.game_name}`,
+    //   data: {
+    //     sessionId,
+    //     roomId: session.room_id,
+    //     gameId: session.game_id,
+    //     gameName: session.game_name,
+    //     inviterId,
+    //   },
+    // });
 
     // Emit game invite event
     try {
