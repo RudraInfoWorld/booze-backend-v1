@@ -59,7 +59,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/friends', friendRoutes); // TODO : - Check this.
+app.use('/api/friends', friendRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/notifications', notificationRoutes);

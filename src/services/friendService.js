@@ -58,17 +58,18 @@ const sendFriendRequest = async (requesterId, addresseeId) => {
       [friendshipId, requesterId, addresseeId, 'pending']
     );
     
+    // TODO : Send notification to addressee
     // Send notification to addressee
-    await notificationService.createNotification({
-      userId: addresseeId,
-      type: 'friend_request',
-      title: 'Friend Request',
-      message: `You received a friend request`,
-      data: {
-        requesterId,
-        friendshipId
-      }
-    });
+    // await notificationService.createNotification({
+    //   userId: addresseeId,
+    //   type: 'friend_request',
+    //   title: 'Friend Request',
+    //   message: `You received a friend request`,
+    //   data: {
+    //     requesterId,
+    //     friendshipId
+    //   }
+    // });
     
     return {
       id: friendshipId,
@@ -121,18 +122,19 @@ const acceptFriendRequest = async (friendshipId, userId) => {
       'UPDATE friendships SET status = ? WHERE id = ?',
       ['accepted', friendshipId]
     );
-    
-    // Send notification to requester
-    await notificationService.createNotification({
-      userId: friendship.requester_id,
-      type: 'friend_request',
-      title: 'Friend Request Accepted',
-      message: `Your friend request has been accepted`,
-      data: {
-        addresseeId: userId,
-        friendshipId
-      }
-    });
+     // TODO : Send notification to addressee
+
+    // // Send notification to requester
+    // await notificationService.createNotification({
+    //   userId: friendship.requester_id,
+    //   type: 'friend_request',
+    //   title: 'Friend Request Accepted',
+    //   message: `Your friend request has been accepted`,
+    //   data: {
+    //     addresseeId: userId,
+    //     friendshipId
+    //   }
+    // });
     
     return {
       id: friendshipId,
@@ -462,12 +464,11 @@ const getFriendSuggestions = async (userId, limit = 10) => {
         )
       GROUP BY u.id
       ORDER BY mutual_count DESC, u.username
-      LIMIT ?`,
+      LIMIT ${limit}`,
       [
         ...userFriends, ...userFriends, ...userFriends, ...userFriends, 
         ...userFriends, ...userFriends,
         userId, userId, userId, userId, userId,
-        limit
       ]
     );
     
@@ -512,8 +513,8 @@ const getRandomUserSuggestions = async (userId, limit = 10, excludeIds = []) => 
       WHERE id NOT IN (${placeholders})
       AND account_status = 'active'
       ORDER BY RAND()
-      LIMIT ?`,
-      [...allExcludeIds, limit]
+      LIMIT ${limit}`,
+      [...allExcludeIds]
     );
     
     return randomUsers;
