@@ -494,18 +494,20 @@ const createJoinRequest = async (userId, roomId) => {
       [userId]
     );
     
+        // TODO : Send notification to addressee
+
     // Notify room host
-    await notificationService.createNotification({
-      userId: room.host_id,
-      type: 'room_join_request',
-      title: 'Room Join Request',
-      message: `${user.username} wants to join your room`,
-      data: {
-        requestId,
-        roomId,
-        userId
-      }
-    });
+    // await notificationService.createNotification({
+    //   userId: room.host_id,
+    //   type: 'room_join_request',
+    //   title: 'Room Join Request',
+    //   message: `${user.username} wants to join your room`,
+    //   data: {
+    //     requestId,
+    //     roomId,
+    //     userId
+    //   }
+    // });
     
     return {
       id: requestId,
@@ -562,18 +564,19 @@ const updateJoinRequest = async (requestId, accept) => {
         'SELECT name FROM rooms WHERE id = ?',
         [request.room_id]
       );
-      
-      // Notify user
-      await notificationService.createNotification({
-        userId: request.user_id,
-        type: 'room_join_request',
-        title: 'Room Join Request Accepted',
-        message: `Your request to join "${room.name}" has been accepted`,
-        data: {
-          requestId,
-          roomId: request.room_id
-        }
-      });
+              // TODO : Send notification to addressee
+
+      // // Notify user
+      // await notificationService.createNotification({
+      //   userId: request.user_id,
+      //   type: 'room_join_request',
+      //   title: 'Room Join Request Accepted',
+      //   message: `Your request to join "${room.name}" has been accepted`,
+      //   data: {
+      //     requestId,
+      //     roomId: request.room_id
+      //   }
+      // });
       
       // Emit socket event
       try {

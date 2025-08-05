@@ -93,7 +93,7 @@ router.get(
 );
 
 /**
- * @route POST /api/rooms/:room_id/join-request
+ * @route GET /api/rooms/join-request/:room_id
  * @desc Request to join a locked room
  * @access Private
  */
