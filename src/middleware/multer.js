@@ -14,7 +14,20 @@ const uploadImage = multer({
   }
 });
 
+// Multer middleware for document upload
+const uploadDocs = multer({
+  storage: storage,
+  limits: { fileSize: 2 * 1024 * 1024 * 1024 }, // 2GB limit
+  fileFilter: function (req, file, cb) {
+    if (!file.originalname.match(/\.(txt|pdf|doc|docx|xls|xlsx|ppt|pptx)$/i)) {
+      return cb(new Error('Only document files are allowed!'), false);
+    }
+    cb(null, true);
+  }
+});
+
 
 module.exports = {
-  uploadImage
+  uploadImage,
+  uploadDocs
 };

@@ -9,12 +9,12 @@ cloudinary.config({
 });
 
 // Upload media
-const uploadMediaToCloudinary = (file) => {
+const uploadMediaToCloudinary = (file , folder_name) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         resource_type: "auto",
-        folder: "Booze",
+        folder: folder_name ? `Booze/${folder_name}` : "Booze",
       },
       (error, result) => {
         if (error) {

@@ -69,6 +69,7 @@ const setupDatabase = async () => {
         bio TEXT,
         profile_picture VARCHAR(255),
         pic_id VARCHAR(36),
+        role ENUM('super_admin', 'admin', 'user') DEFAULT 'user',
         interests JSON,
         vibe_preference VARCHAR(50),
         account_status ENUM('active', 'ghost', 'private', 'deleted') DEFAULT 'active',
@@ -79,7 +80,6 @@ const setupDatabase = async () => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `);
-
     // User sessions table
     await query(`
       CREATE TABLE IF NOT EXISTS user_sessions (
@@ -161,7 +161,8 @@ const setupDatabase = async () => {
         id VARCHAR(36) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
-        rules TEXT,
+        rules varchar(255),
+        rules_id varchar(100),
         min_players INT DEFAULT 2,
         max_players INT DEFAULT 8,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
