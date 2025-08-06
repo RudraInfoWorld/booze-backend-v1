@@ -26,8 +26,20 @@ const uploadDocs = multer({
   }
 });
 
+// Multer middleware for video/audio files upload
+const uploadMedia = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 * 1024 }, // 5 GB limit
+  fileFilter: function (req, file, cb) {
+    if (!file.originalname.match(/\.(mp4|webm|mov|mp3|wav)$/)) {
+      return cb(new Error('Only video/audio files are allowed for recordings!'), false);
+    }
+    cb(null, true);
+  }
+});
 
 module.exports = {
   uploadImage,
-  uploadDocs
+  uploadDocs,
+  uploadMedia
 };
