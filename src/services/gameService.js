@@ -690,7 +690,7 @@ const inviteToGame = async (sessionId, inviterId, inviteeId) => {
 
     // Get inviter username
     const [inviterUser] = await db.query('SELECT username FROM users WHERE id = ?', [inviterId]);
-    // TODO : Send notification to addressee
+    // @FIRE : Send notification to addressee
     // Send notification to invitee
     // await notificationService.createNotification({
     //   userId: inviteeId,

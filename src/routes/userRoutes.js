@@ -1,7 +1,7 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 const userController = require('../controllers/userController');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, authorize, authorizeAdmin } = require('../middleware/auth');
 const { uploadImage } = require('../middleware/multer');
 const router = express.Router();
 
@@ -99,5 +99,30 @@ router.get('/search', authenticate, userController.searchUsers);
  * @access Private
  */
 router.get('/:username', authenticate, userController.getUserByUsername);
+
+/**
+ * @route GET /api/users/:userId/:isAdmin
+ * @desc Mark user as admin
+ * @access Private
+ */
+router.get(
+  '/:userId/:isAdmin',
+  authenticate,
+  authorizeAdmin,
+  [
+    param('userId')
+      .notEmpty()
+      .withMessage('User ID is required')
+      .isUUID()
+      .withMessage('User ID must be a valid UUID'),
+
+    param('isAdmin')
+      .notEmpty()
+      .withMessage('Admin status is required')
+      .isBoolean()
+      .withMessage('Admin status must be true or false'),
+  ],
+  userController.markUserAsAdmin
+);
 
 module.exports = router;

@@ -58,7 +58,7 @@ const sendFriendRequest = async (requesterId, addresseeId) => {
       [friendshipId, requesterId, addresseeId, 'pending']
     );
 
-    // TODO : Send notification to addressee
+    // @FIRE : Send notification to addressee
     // Send notification to addressee
     // await notificationService.createNotification({
     //   userId: addresseeId,
@@ -119,7 +119,7 @@ const acceptFriendRequest = async (friendshipId, userId) => {
 
     // Update friendship status
     await db.query('UPDATE friendships SET status = ? WHERE id = ?', ['accepted', friendshipId]);
-    // TODO : Send notification to addressee
+    // @FIRE : Send notification to addressee
 
     // // Send notification to requester
     // await notificationService.createNotification({

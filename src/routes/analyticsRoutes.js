@@ -1,7 +1,8 @@
 const express = require('express');
 const analyticsService = require('../services/analyticsService');
-const { authenticate, authorize } = require('../middleware/auth');
+const { authenticate, authorize, authorizeAdmin } = require('../middleware/auth');
 const { catchAsync } = require('../utils/errorHandler');
+const db = require('../config/database');
 
 const router = express.Router();
 
@@ -9,7 +10,7 @@ const router = express.Router();
 router.use(authenticate);
 
 // Analytics routes require admin role
-router.use(authorize('admin'));
+router.use(authorizeAdmin);
 
 /**
  * @route GET /api/analytics/users
