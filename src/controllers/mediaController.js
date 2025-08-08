@@ -20,7 +20,8 @@ const storeMedia = catchAsync(async (req, res) => {
     });
   }
   
-  const { room_id, type } = req.body;
+  const { room_id } = req.body;
+  const { type } = req.query;
   
   const mediaData = {
     userId: req.user.id,

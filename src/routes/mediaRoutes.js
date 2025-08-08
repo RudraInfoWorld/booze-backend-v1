@@ -1,5 +1,5 @@
 const express = require('express');
-const { body } = require('express-validator');
+const { body , query  } = require('express-validator');
 const mediaController = require('../controllers/mediaController');
 const { authenticate } = require('../middleware/auth');
 const { uploadImage, uploadMedia } = require('../middleware/multer');
@@ -11,7 +11,10 @@ router.use(authenticate);
 
 // Dynamic middleware selector
 function mediaUploadMiddleware(req, res, next) {
-  const type = req.body.type;
+  const type = req.query.type;
+  if(!type) {
+    return res.status(400).json({ error: 'Media type is required' });
+  }
   
   if (type === 'screenshot') {
     uploadImage.single('file')(req, res, next);
@@ -32,7 +35,7 @@ router.post(
   mediaUploadMiddleware,
   [
     body('room_id').notEmpty().withMessage('Room ID is required'),
-    body('type').notEmpty().withMessage('Media type is required')
+    query('type').notEmpty().withMessage('Media type is required')
       .isIn(['screenshot', 'recording']).withMessage('Media type must be screenshot or recording')
   ],
   mediaController.storeMedia

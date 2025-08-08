@@ -208,6 +208,7 @@ const setupDatabase = async () => {
         room_id VARCHAR(36) NOT NULL,
         type ENUM('screenshot', 'recording') NOT NULL,
         file_path VARCHAR(255) NOT NULL,
+        file_id varchar(155),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE

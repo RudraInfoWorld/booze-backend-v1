@@ -5,6 +5,7 @@ const logger = require('../config/logger');
 const fs = require('fs');
 const path = require('path');
 const { promisify } = require('util');
+const { uploadMediaToCloudinary, deleteMediaFromCloudinary } = require('../middleware/cloudinary');
 const unlinkAsync = promisify(fs.unlink);
 
 /**
@@ -35,14 +36,15 @@ const storeMedia = async (mediaData) => {
     if (!participant) {
       throw new AppError('You must be in the room to save media', 403);
     }
-    
+    //upload media to cloudinary
+    const uploadedFile =  await uploadMediaToCloudinary(file, type)
+    const { public_id = null ,  url = null  } = uploadedFile || {};
     // Create media record
     const mediaId = uuidv4();
-    const filePath = `uploads/media/${mediaId}-${file.filename}`;
     
     await db.query(
-      'INSERT INTO media_records (id, user_id, room_id, type, file_path) VALUES (?, ?, ?, ?, ?)',
-      [mediaId, userId, roomId, type, filePath]
+      'INSERT INTO media_records (id, user_id, room_id, type, file_path , file_id) VALUES (?, ?, ?, ?, ?, ?)',
+      [mediaId, userId, roomId, type, url, public_id]
     );
     
     return {
@@ -50,7 +52,8 @@ const storeMedia = async (mediaData) => {
       userId,
       roomId,
       type,
-      filePath,
+      file_path: url,
+      file_id: public_id,
       created_at: new Date()
     };
   } catch (error) {
@@ -91,8 +94,7 @@ const getUserMediaRecords = async (userId, type = null, limit = 20, offset = 0) 
       params.push(type);
     }
     
-    query += ' ORDER BY m.created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    query += ` ORDER BY m.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
     
     // Execute query
     const records = await db.query(query, params);
@@ -144,8 +146,7 @@ const getRoomMediaRecords = async (roomId, type = null, limit = 20, offset = 0) 
       params.push(type);
     }
     
-    query += ' ORDER BY m.created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    query += ` ORDER BY m.created_at DESC LIMIT ${limit} OFFSET ${offset}`;
     
     // Execute query
     const records = await db.query(query, params);
@@ -175,7 +176,7 @@ const deleteMedia = async (mediaId, userId) => {
   try {
     // Check if media record exists and belongs to user
     const [media] = await db.query(
-      'SELECT id, file_path FROM media_records WHERE id = ? AND user_id = ?',
+      'SELECT id, file_path , file_id FROM media_records WHERE id = ? AND user_id = ?',
       [mediaId, userId]
     );
     
@@ -184,12 +185,11 @@ const deleteMedia = async (mediaId, userId) => {
     }
     
     // Delete file
-    if (media.file_path) {
-      const filePath = path.join(__dirname, '../../', media.file_path);
+    if (media.file_id) {
       try {
-        await unlinkAsync(filePath);
-      } catch (fileError) {
-        logger.warn(`Could not delete file: ${fileError.message}`);
+        await deleteMediaFromCloudinary(media.file_id);
+      } catch (error) {
+        logger.warn(`Could not delete file: ${error.message}`);
       }
     }
     
