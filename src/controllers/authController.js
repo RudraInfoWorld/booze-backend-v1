@@ -12,21 +12,21 @@ const requestOTP = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { phone } = req.body;
-  
+
   // Request OTP
   const result = await authService.requestOTP(phone);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      expires_at: result.expiresAt
+      expires_at: result.expiresAt,
     },
-    message: 'OTP sent successfully'
+    message: 'OTP sent successfully',
   });
 });
 
@@ -39,23 +39,23 @@ const registerWithPhone = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { phone, otp } = req.body;
-  
+
   // Register user
   const result = await authService.registerWithPhone({ phone, otp });
-  
+
   res.status(201).json({
     status: 'success',
     data: {
       user: result.user,
       token: result.token,
-      refresh_token: result.refreshToken
+      refresh_token: result.refreshToken,
     },
-    message: 'Registration successful'
+    message: 'Registration successful',
   });
 });
 
@@ -68,31 +68,31 @@ const loginWithPhone = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { phone, otp } = req.body;
-  
+
   // Get device info
   const deviceInfo = {
     deviceName: req.body.device_name || 'Unknown Device',
     deviceId: req.body.device_id || null,
     ipAddress: req.ip,
-    userAgent: req.headers['user-agent']
+    userAgent: req.headers['user-agent'],
   };
-  
+
   // Login user
   const result = await authService.loginWithPhone(phone, otp, deviceInfo);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       user: result.user,
       token: result.token,
-      refresh_token: result.refreshToken
+      refresh_token: result.refreshToken,
     },
-    message: 'Login successful'
+    message: 'Login successful',
   });
 });
 
@@ -105,25 +105,25 @@ const loginWithSocial = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { provider, provider_token, email, name } = req.body;
-  
+
   // Validate provider
   if (!['google', 'apple'].includes(provider)) {
     throw new AppError('Invalid provider', 400);
   }
-  
+
   // Get device info
   const deviceInfo = {
     deviceName: req.body.device_name || 'Unknown Device',
     deviceId: req.body.device_id || null,
     ipAddress: req.ip,
-    userAgent: req.headers['user-agent']
+    userAgent: req.headers['user-agent'],
   };
-  
+
   // Login with social provider
   // This is a simplified version - in a real implementation you would verify the provider_token
   // with Google or Apple to get the user ID and other details
@@ -131,19 +131,19 @@ const loginWithSocial = catchAsync(async (req, res) => {
     provider,
     providerId: req.body.provider_id, // This would be verified and obtained from provider_token
     email,
-    name
+    name,
   };
-  
+
   const result = await authService.loginWithSocial(socialData, deviceInfo);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       user: result.user,
       token: result.token,
-      refresh_token: result.refreshToken
+      refresh_token: result.refreshToken,
     },
-    message: 'Social login successful'
+    message: 'Social login successful',
   });
 });
 
@@ -156,21 +156,21 @@ const refreshToken = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { refresh_token } = req.body;
-  
+
   // Refresh token
   const result = await authService.refreshToken(refresh_token);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       token: result.token,
-      refresh_token: result.refreshToken
-    }
+      refresh_token: result.refreshToken,
+    },
   });
 });
 
@@ -179,13 +179,13 @@ const refreshToken = catchAsync(async (req, res) => {
  */
 const logout = catchAsync(async (req, res) => {
   const deviceId = req.body.device_id;
-  
+
   // Logout user
   await authService.logout(req.user.id, deviceId);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'Logged out successfully'
+    message: 'Logged out successfully',
   });
 });
 
@@ -195,12 +195,12 @@ const logout = catchAsync(async (req, res) => {
 const getLoginActivity = catchAsync(async (req, res) => {
   // Get login activity
   const sessions = await authService.getLoginActivity(req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      sessions
-    }
+      sessions,
+    },
   });
 });
 
@@ -211,5 +211,5 @@ module.exports = {
   loginWithSocial,
   refreshToken,
   logout,
-  getLoginActivity
+  getLoginActivity,
 };

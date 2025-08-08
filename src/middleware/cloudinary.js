@@ -1,4 +1,4 @@
-const cloudinary = require("cloudinary").v2;
+const cloudinary = require('cloudinary').v2;
 const logger = require('../config/logger');
 
 // Config
@@ -9,16 +9,16 @@ cloudinary.config({
 });
 
 // Upload media
-const uploadMediaToCloudinary = (file , folder_name) => {
+const uploadMediaToCloudinary = (file, folder_name) => {
   return new Promise((resolve, reject) => {
     const uploadStream = cloudinary.uploader.upload_stream(
       {
-        resource_type: "auto",
-        folder: folder_name ? `Booze/${folder_name}` : "Booze",
+        resource_type: 'auto',
+        folder: folder_name ? `Booze/${folder_name}` : 'Booze',
       },
       (error, result) => {
         if (error) {
-          logger.error("Error while uploading to Cloudinary:", error);
+          logger.error('Error while uploading to Cloudinary:', error);
           reject(error);
         } else {
           resolve(result);
@@ -33,23 +33,19 @@ const uploadMediaToCloudinary = (file , folder_name) => {
 // Delete media by public_id
 const deleteMediaFromCloudinary = (publicId) => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader.destroy(
-      publicId,
-      { resource_type: "auto" }, 
-      (error, result) => {
-        if (error) {
-          logger.error("Error while deleting from Cloudinary:", error);
-          reject(error);
-        } else {
-          resolve(result);
-        }
+    cloudinary.uploader.destroy(publicId, { resource_type: 'auto' }, (error, result) => {
+      if (error) {
+        logger.error('Error while deleting from Cloudinary:', error);
+        reject(error);
+      } else {
+        resolve(result);
       }
-    );
+    });
   });
 };
 
 // Export both
 module.exports = {
   uploadMediaToCloudinary,
-  deleteMediaFromCloudinary
+  deleteMediaFromCloudinary,
 };

@@ -1,8 +1,8 @@
-const { validationResult } = require("express-validator");
-const { catchAsync, AppError } = require("../utils/errorHandler");
-const userService = require("../services/userService");
-const logger = require("../config/logger");
-const { uploadMediaToCloudinary } = require("../middleware/cloudinary");
+const { validationResult } = require('express-validator');
+const { catchAsync, AppError } = require('../utils/errorHandler');
+const userService = require('../services/userService');
+const logger = require('../config/logger');
+const { uploadMediaToCloudinary } = require('../middleware/cloudinary');
 
 /**
  * Get user profile
@@ -11,7 +11,7 @@ const getProfile = catchAsync(async (req, res) => {
   const user = await userService.getUserById(req.user.id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user,
     },
@@ -27,7 +27,7 @@ const getUserByUsername = catchAsync(async (req, res) => {
   const user = await userService.getUserByUsername(username);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user,
     },
@@ -41,13 +41,13 @@ const checkUsername = catchAsync(async (req, res) => {
   const { username } = req.query;
 
   if (!username) {
-    throw new AppError("Username is required", 400);
+    throw new AppError('Username is required', 400);
   }
 
   const isAvailable = await userService.isUsernameAvailable(username);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       username,
       available: isAvailable,
@@ -63,7 +63,7 @@ const updateProfile = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -87,11 +87,11 @@ const updateProfile = catchAsync(async (req, res) => {
   const updatedUser = await userService.updateProfile(req.user.id, updateData);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user: updatedUser,
     },
-    message: "Profile updated successfully",
+    message: 'Profile updated successfully',
   });
 });
 
@@ -100,24 +100,20 @@ const updateProfile = catchAsync(async (req, res) => {
  */
 const uploadProfilePicture = catchAsync(async (req, res) => {
   if (!req.file) {
-    throw new AppError("No file uploaded", 400);
+    throw new AppError('No file uploaded', 400);
   }
 
   const result = await uploadMediaToCloudinary(req.file);
-  const { public_id , url} = result;
+  const { public_id, url } = result;
 
-  const updatedUser = await userService.uploadProfilePicture(
-    req.user.id,
-    public_id ,
-    url
-  );
+  const updatedUser = await userService.uploadProfilePicture(req.user.id, public_id, url);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user: updatedUser,
     },
-    message: "Profile picture uploaded successfully",
+    message: 'Profile picture uploaded successfully',
   });
 });
 
@@ -128,11 +124,11 @@ const generateAIAvatar = catchAsync(async (req, res) => {
   const updatedUser = await userService.generateAIAvatar(req.user.id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user: updatedUser,
     },
-    message: "AI avatar generated successfully",
+    message: 'AI avatar generated successfully',
   });
 });
 
@@ -144,24 +140,21 @@ const updateAccountStatus = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
 
   const { status } = req.body;
 
-  const updatedUser = await userService.updateAccountStatus(
-    req.user.id,
-    status
-  );
+  const updatedUser = await userService.updateAccountStatus(req.user.id, status);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       user: updatedUser,
     },
-    message: "Account status updated successfully",
+    message: 'Account status updated successfully',
   });
 });
 
@@ -172,8 +165,8 @@ const deleteAccount = catchAsync(async (req, res) => {
   await userService.deleteAccount(req.user.id);
 
   res.status(200).json({
-    status: "success",
-    message: "Account deleted successfully",
+    status: 'success',
+    message: 'Account deleted successfully',
   });
 });
 
@@ -185,12 +178,12 @@ const searchUsers = catchAsync(async (req, res) => {
   const q_limit = parseInt(limit) || 10;
 
   if (!q) {
-    throw new AppError("Search query is required", 400);
+    throw new AppError('Search query is required', 400);
   }
   const users = await userService.searchUsers(q, q_limit);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       users,
     },

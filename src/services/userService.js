@@ -22,11 +22,11 @@ const getUserById = async (userId) => {
       FROM users WHERE id = ? AND account_status != 'deleted'`,
       [userId]
     );
-    
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
-    
+
     return user;
   } catch (error) {
     logger.error(`Get user error: ${error.message}`);
@@ -47,11 +47,11 @@ const getUserByUsername = async (username) => {
       FROM users WHERE username = ? AND account_status != 'deleted'`,
       [username]
     );
-    
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
-    
+
     return user;
   } catch (error) {
     logger.error(`Get user by username error: ${error.message}`);
@@ -66,11 +66,8 @@ const getUserByUsername = async (username) => {
  */
 const isUsernameAvailable = async (username) => {
   try {
-    const [user] = await db.query(
-      'SELECT id FROM users WHERE username = ?',
-      [username]
-    );
-    
+    const [user] = await db.query('SELECT id FROM users WHERE username = ?', [username]);
+
     return !user;
   } catch (error) {
     logger.error(`Username availability check error: ${error.message}`);
@@ -86,65 +83,65 @@ const isUsernameAvailable = async (username) => {
  */
 const updateProfile = async (userId, updateData) => {
   try {
-    const { username, bio, interests, vibe_preference, mode_preference ,email } = updateData;
-    
+    const { username, bio, interests, vibe_preference, mode_preference, email } = updateData;
+
     // Check if username is being updated and is available
     if (username) {
-      const [existingUser] = await db.query(
-        'SELECT id FROM users WHERE username = ? AND id != ?',
-        [username, userId]
-      );
-      
+      const [existingUser] = await db.query('SELECT id FROM users WHERE username = ? AND id != ?', [
+        username,
+        userId,
+      ]);
+
       if (existingUser) {
         throw new AppError('Username already taken', 400);
       }
     }
-    
+
     // Create update query
     let updateQuery = 'UPDATE users SET ';
     const updateValues = [];
     const updateFields = [];
-    
+
     if (username) {
       updateFields.push('username = ?');
       updateValues.push(username);
     }
-    
+
     if (bio !== undefined) {
       updateFields.push('bio = ?');
       updateValues.push(bio);
     }
-    
+
     if (interests) {
       updateFields.push('interests = ?');
       updateValues.push(JSON.stringify(interests));
     }
-    
+
     if (vibe_preference) {
       updateFields.push('vibe_preference = ?');
       updateValues.push(vibe_preference);
     }
-    
+
     if (mode_preference) {
       updateFields.push('mode_preference = ?');
       updateValues.push(mode_preference);
     }
 
-    if(email) {
+    if (email) {
       updateFields.push('email = ?');
       updateValues.push(email);
     }
-    
+
     if (updateFields.length === 0) {
       return getUserById(userId);
     }
-    
+
     updateQuery += updateFields.join(', ');
     updateQuery += ' WHERE id = ?';
     updateValues.push(userId);
     // Update user
     await db.query(updateQuery, updateValues);
-    
+
     // Return updated user
     return getUserById(userId);
   } catch (error) {
@@ -159,18 +156,15 @@ const updateProfile = async (userId, updateData) => {
  * @param {Object} file - Uploaded file object
  * @returns {Promise<Object>} - Updated user object
  */
-const uploadProfilePicture = async (userId, public_id , url) => {
+const uploadProfilePicture = async (userId, public_id, url) => {
   try {
     // Get current profile picture
-    const [user] = await db.query(
-      'SELECT profile_picture FROM users WHERE id = ?',
-      [userId]
-    );
-    
+    const [user] = await db.query('SELECT profile_picture FROM users WHERE id = ?', [userId]);
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
-    
+
     // Delete old profile picture if exists
     if (user.pic_id) {
       try {
@@ -179,13 +173,14 @@ const uploadProfilePicture = async (userId, public_id , url) => {
         logger.warn(`Could not delete old profile picture: ${err.message}`);
       }
     }
-    
+
     // Set profile picture path in database
-    await db.query(
-      'UPDATE users SET profile_picture = ? , pic_id = ? WHERE id = ?',
-      [url, public_id, userId]
-    );
-    
+    await db.query('UPDATE users SET profile_picture = ? , pic_id = ? WHERE id = ?', [
+      url,
+      public_id,
+      userId,
+    ]);
+
     // Return updated user
     return getUserById(userId);
   } catch (error) {
@@ -203,17 +198,14 @@ const uploadProfilePicture = async (userId, public_id , url) => {
 const updateAccountStatus = async (userId, status) => {
   try {
     // Validate status
-    const validStatuses = ['active','ghost','private'];
+    const validStatuses = ['active', 'ghost', 'private'];
     if (!validStatuses.includes(status)) {
       throw new AppError('Invalid account status', 400);
     }
-    
+
     // Update status
-    await db.query(
-      'UPDATE users SET account_status = ? WHERE id = ?',
-      [status, userId]
-    );
-    
+    await db.query('UPDATE users SET account_status = ? WHERE id = ?', [status, userId]);
+
     // Return updated user
     return getUserById(userId);
   } catch (error) {
@@ -230,17 +222,11 @@ const updateAccountStatus = async (userId, status) => {
 const deleteAccount = async (userId) => {
   try {
     // Set account status to deleted
-    await db.query(
-      'UPDATE users SET account_status = ? WHERE id = ?',
-      ['deleted', userId]
-    );
-    
+    await db.query('UPDATE users SET account_status = ? WHERE id = ?', ['deleted', userId]);
+
     // Invalidate all sessions
-    await db.query(
-      'UPDATE user_sessions SET is_active = FALSE WHERE user_id = ?',
-      [userId]
-    );
-    
+    await db.query('UPDATE user_sessions SET is_active = FALSE WHERE user_id = ?', [userId]);
+
     return true;
   } catch (error) {
     logger.error(`Delete account error: ${error.message}`);
@@ -264,7 +250,7 @@ const searchUsers = async (searchTerm, limit = 10) => {
       LIMIT ${safeLimit}`,
       [`%${searchTerm}%`]
     );
-    
+
     return users;
   } catch (error) {
     logger.error(`Search users error: ${error.message}`);
@@ -280,5 +266,5 @@ module.exports = {
   uploadProfilePicture,
   updateAccountStatus,
   deleteAccount,
-  searchUsers
+  searchUsers,
 };

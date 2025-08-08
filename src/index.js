@@ -45,10 +45,12 @@ if (!fs.existsSync(uploadsDir)) {
 
 // Middleware
 app.use(helmet()); // Security headers
-app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || '*',
+    credentials: true,
+  })
+);
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 app.use(morgan('combined', { stream: logger.stream })); // HTTP request logging
@@ -71,7 +73,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'UP',
     timestamp: new Date(),
-    service: 'booze-api'
+    service: 'booze-api',
   });
 });
 
@@ -79,7 +81,7 @@ app.get('/health', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     status: 'error',
-    message: 'Resource not found'
+    message: 'Resource not found',
   });
 });
 
@@ -91,7 +93,7 @@ app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({
     status: 'error',
     message: err.message || 'Internal Server Error',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 });
 

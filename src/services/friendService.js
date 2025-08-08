@@ -19,16 +19,16 @@ const sendFriendRequest = async (requesterId, addresseeId) => {
     if (!notificationService) {
       notificationService = require('./notificationService');
     }
-    
+
     // Check if users exist
     await userService.getUserById(requesterId);
     await userService.getUserById(addresseeId);
-    
+
     // Cannot send friend request to yourself
     if (requesterId === addresseeId) {
       throw new AppError('Cannot send friend request to yourself', 400);
     }
-    
+
     // Check if friendship already exists
     const [existingFriendship] = await db.query(
       `SELECT id, status FROM friendships 
@@ -36,7 +36,7 @@ const sendFriendRequest = async (requesterId, addresseeId) => {
       OR (requester_id = ? AND addressee_id = ?)`,
       [requesterId, addresseeId, addresseeId, requesterId]
     );
-    
+
     if (existingFriendship) {
       if (existingFriendship.status === 'blocked') {
         throw new AppError('Cannot send friend request', 400);
@@ -49,15 +49,15 @@ const sendFriendRequest = async (requesterId, addresseeId) => {
       }
       // If rejected, allow sending again
     }
-    
+
     // Create new friendship
     const friendshipId = uuidv4();
-    
+
     await db.query(
       'INSERT INTO friendships (id, requester_id, addressee_id, status) VALUES (?, ?, ?, ?)',
       [friendshipId, requesterId, addresseeId, 'pending']
     );
-    
+
     // TODO : Send notification to addressee
     // Send notification to addressee
     // await notificationService.createNotification({
@@ -70,13 +70,13 @@ const sendFriendRequest = async (requesterId, addresseeId) => {
     //     friendshipId
     //   }
     // });
-    
+
     return {
       id: friendshipId,
       requesterId,
       addresseeId,
       status: 'pending',
-      created_at: new Date()
+      created_at: new Date(),
     };
   } catch (error) {
     logger.error(`Send friend request error: ${error.message}`);
@@ -96,33 +96,30 @@ const acceptFriendRequest = async (friendshipId, userId) => {
     if (!notificationService) {
       notificationService = require('./notificationService');
     }
-    
+
     // Get friendship
     const [friendship] = await db.query(
       'SELECT id, requester_id, addressee_id, status FROM friendships WHERE id = ?',
       [friendshipId]
     );
-    
+
     if (!friendship) {
       throw new AppError('Friend request not found', 404);
     }
-    
+
     // Check if user is the addressee
     if (friendship.addressee_id !== userId) {
       throw new AppError('Not authorized to accept this friend request', 403);
     }
-    
+
     // Check if status is pending
     if (friendship.status !== 'pending') {
       throw new AppError('Friend request already processed', 400);
     }
-    
+
     // Update friendship status
-    await db.query(
-      'UPDATE friendships SET status = ? WHERE id = ?',
-      ['accepted', friendshipId]
-    );
-     // TODO : Send notification to addressee
+    await db.query('UPDATE friendships SET status = ? WHERE id = ?', ['accepted', friendshipId]);
+    // TODO : Send notification to addressee
 
     // // Send notification to requester
     // await notificationService.createNotification({
@@ -135,12 +132,12 @@ const acceptFriendRequest = async (friendshipId, userId) => {
     //     friendshipId
     //   }
     // });
-    
+
     return {
       id: friendshipId,
       requesterId: friendship.requester_id,
       addresseeId: friendship.addressee_id,
-      status: 'accepted'
+      status: 'accepted',
     };
   } catch (error) {
     logger.error(`Accept friend request error: ${error.message}`);
@@ -161,32 +158,29 @@ const rejectFriendRequest = async (friendshipId, userId) => {
       'SELECT id, requester_id, addressee_id, status FROM friendships WHERE id = ?',
       [friendshipId]
     );
-    
+
     if (!friendship) {
       throw new AppError('Friend request not found', 404);
     }
-    
+
     // Check if user is the addressee
     if (friendship.addressee_id !== userId) {
       throw new AppError('Not authorized to reject this friend request', 403);
     }
-    
+
     // Check if status is pending
     if (friendship.status !== 'pending') {
       throw new AppError('Friend request already processed', 400);
     }
-    
+
     // Update friendship status
-    await db.query(
-      'UPDATE friendships SET status = ? WHERE id = ?',
-      ['rejected', friendshipId]
-    );
-    
+    await db.query('UPDATE friendships SET status = ? WHERE id = ?', ['rejected', friendshipId]);
+
     return {
       id: friendshipId,
       requesterId: friendship.requester_id,
       addresseeId: friendship.addressee_id,
-      status: 'rejected'
+      status: 'rejected',
     };
   } catch (error) {
     logger.error(`Reject friend request error: ${error.message}`);
@@ -205,12 +199,12 @@ const blockUser = async (userId, blockedUserId) => {
     // Check if users exist
     await userService.getUserById(userId);
     await userService.getUserById(blockedUserId);
-    
+
     // Cannot block yourself
     if (userId === blockedUserId) {
       throw new AppError('Cannot block yourself', 400);
     }
-    
+
     // Check if friendship exists
     const [existingFriendship] = await db.query(
       `SELECT id, requester_id, addressee_id, status FROM friendships 
@@ -218,13 +212,13 @@ const blockUser = async (userId, blockedUserId) => {
       OR (requester_id = ? AND addressee_id = ?)`,
       [userId, blockedUserId, blockedUserId, userId]
     );
-    
+
     let friendshipId;
-    
+
     if (existingFriendship) {
       // Update existing friendship
       friendshipId = existingFriendship.id;
-      
+
       await db.query(
         'UPDATE friendships SET status = ?, requester_id = ?, addressee_id = ? WHERE id = ?',
         ['blocked', userId, blockedUserId, friendshipId]
@@ -232,18 +226,18 @@ const blockUser = async (userId, blockedUserId) => {
     } else {
       // Create new blocked relationship
       friendshipId = uuidv4();
-      
+
       await db.query(
         'INSERT INTO friendships (id, requester_id, addressee_id, status) VALUES (?, ?, ?, ?)',
         [friendshipId, userId, blockedUserId, 'blocked']
       );
     }
-    
+
     return {
       id: friendshipId,
       requesterId: userId,
       addresseeId: blockedUserId,
-      status: 'blocked'
+      status: 'blocked',
     };
   } catch (error) {
     logger.error(`Block user error: ${error.message}`);
@@ -265,17 +259,14 @@ const unblockUser = async (userId, blockedUserId) => {
       WHERE requester_id = ? AND addressee_id = ? AND status = ?`,
       [userId, blockedUserId, 'blocked']
     );
-    
+
     if (!block) {
       throw new AppError('User not blocked', 404);
     }
-    
+
     // Delete block
-    await db.query(
-      'DELETE FROM friendships WHERE id = ?',
-      [block.id]
-    );
-    
+    await db.query('DELETE FROM friendships WHERE id = ?', [block.id]);
+
     return true;
   } catch (error) {
     logger.error(`Unblock user error: ${error.message}`);
@@ -299,17 +290,14 @@ const removeFriend = async (userId, friendId) => {
       AND status = ?`,
       [userId, friendId, friendId, userId, 'accepted']
     );
-    
+
     if (!friendship) {
       throw new AppError('Friendship not found', 404);
     }
-    
+
     // Delete friendship
-    await db.query(
-      'DELETE FROM friendships WHERE id = ?',
-      [friendship.id]
-    );
-    
+    await db.query('DELETE FROM friendships WHERE id = ?', [friendship.id]);
+
     return true;
   } catch (error) {
     logger.error(`Remove friend error: ${error.message}`);
@@ -335,7 +323,7 @@ const getUserFriends = async (userId, limit = 20, offset = 0) => {
       WHERE f.requester_id = ? AND f.status = ? AND u.account_status != 'deleted'`,
       [userId, 'accepted']
     );
-    
+
     // Get friends as addressee
     const addresseeFriends = await db.query(
       `SELECT f.id, f.requester_id, f.addressee_id, f.status, f.created_at,
@@ -345,30 +333,30 @@ const getUserFriends = async (userId, limit = 20, offset = 0) => {
       WHERE f.addressee_id = ? AND f.status = ? AND u.account_status != 'deleted'`,
       [userId, 'accepted']
     );
-    
+
     // Combine and format results
     const allFriends = [
-      ...requesterFriends.map(f => ({
+      ...requesterFriends.map((f) => ({
         friendship_id: f.id,
         user_id: f.friend_id,
         username: f.username,
         profile_picture: f.profile_picture,
         bio: f.bio,
-        created_at: f.created_at
+        created_at: f.created_at,
       })),
-      ...addresseeFriends.map(f => ({
+      ...addresseeFriends.map((f) => ({
         friendship_id: f.id,
         user_id: f.friend_id,
         username: f.username,
         profile_picture: f.profile_picture,
         bio: f.bio,
-        created_at: f.created_at
-      }))
+        created_at: f.created_at,
+      })),
     ];
-    
+
     // Sort by username
     allFriends.sort((a, b) => a.username.localeCompare(b.username));
-    
+
     // Apply pagination
     return allFriends.slice(offset, offset + limit);
   } catch (error) {
@@ -394,14 +382,14 @@ const getPendingFriendRequests = async (userId) => {
       ORDER BY f.created_at DESC`,
       [userId, 'pending']
     );
-    
-    return requests.map(r => ({
+
+    return requests.map((r) => ({
       request_id: r.id,
       user_id: r.requester_id,
       username: r.username,
       profile_picture: r.profile_picture,
       bio: r.bio,
-      created_at: r.created_at
+      created_at: r.created_at,
     }));
   } catch (error) {
     logger.error(`Get pending friend requests error: ${error.message}`);
@@ -419,18 +407,18 @@ const getFriendSuggestions = async (userId, limit = 10) => {
   try {
     // Get mutual friends (friends of friends)
     // This is a simple implementation - could be expanded with more advanced algorithms
-    
+
     // Get current user's friends
     const userFriends = await getUserFriendsIds(userId);
-    
+
     if (userFriends.length === 0) {
       // If no friends, return random users
       return getRandomUserSuggestions(userId, limit);
     }
-    
+
     // Get friends of friends
     const placeholders = userFriends.map(() => '?').join(',');
-    
+
     const mutualFriends = await db.query(
       `SELECT DISTINCT 
         u.id, u.username, u.profile_picture, u.bio,
@@ -466,23 +454,31 @@ const getFriendSuggestions = async (userId, limit = 10) => {
       ORDER BY mutual_count DESC, u.username
       LIMIT ${limit}`,
       [
-        ...userFriends, ...userFriends, ...userFriends, ...userFriends, 
-        ...userFriends, ...userFriends,
-        userId, userId, userId, userId, userId,
+        ...userFriends,
+        ...userFriends,
+        ...userFriends,
+        ...userFriends,
+        ...userFriends,
+        ...userFriends,
+        userId,
+        userId,
+        userId,
+        userId,
+        userId,
       ]
     );
-    
+
     // If not enough mutual friends, supplement with random users
     if (mutualFriends.length < limit) {
       const randomUsers = await getRandomUserSuggestions(
-        userId, 
-        limit - mutualFriends.length, 
-        mutualFriends.map(u => u.id)
+        userId,
+        limit - mutualFriends.length,
+        mutualFriends.map((u) => u.id)
       );
-      
+
       return [...mutualFriends, ...randomUsers];
     }
-    
+
     return mutualFriends;
   } catch (error) {
     logger.error(`Get friend suggestions error: ${error.message}`);
@@ -501,11 +497,11 @@ const getRandomUserSuggestions = async (userId, limit = 10, excludeIds = []) => 
   try {
     // Get all user's friends
     const userFriends = await getUserFriendsIds(userId);
-    
+
     // Combine all IDs to exclude
     const allExcludeIds = [userId, ...userFriends, ...excludeIds];
     const placeholders = allExcludeIds.map(() => '?').join(',');
-    
+
     // Get random users
     const randomUsers = await db.query(
       `SELECT id, username, profile_picture, bio
@@ -516,7 +512,7 @@ const getRandomUserSuggestions = async (userId, limit = 10, excludeIds = []) => 
       LIMIT ${limit}`,
       [...allExcludeIds]
     );
-    
+
     return randomUsers;
   } catch (error) {
     logger.error(`Get random user suggestions error: ${error.message}`);
@@ -538,7 +534,7 @@ const getUserFriendsIds = async (userId) => {
       WHERE requester_id = ? AND status = ?`,
       [userId, 'accepted']
     );
-    
+
     // Get friends as addressee
     const addresseeFriends = await db.query(
       `SELECT requester_id
@@ -546,11 +542,11 @@ const getUserFriendsIds = async (userId) => {
       WHERE addressee_id = ? AND status = ?`,
       [userId, 'accepted']
     );
-    
+
     // Combine and extract IDs
     return [
-      ...requesterFriends.map(f => f.addressee_id),
-      ...addresseeFriends.map(f => f.requester_id)
+      ...requesterFriends.map((f) => f.addressee_id),
+      ...addresseeFriends.map((f) => f.requester_id),
     ];
   } catch (error) {
     logger.error(`Get user friend IDs error: ${error.message}`);
@@ -573,7 +569,7 @@ const areFriends = async (userId1, userId2) => {
       AND status = ?`,
       [userId1, userId2, userId2, userId1, 'accepted']
     );
-    
+
     return !!friendship;
   } catch (error) {
     logger.error(`Check if users are friends error: ${error.message}`);
@@ -596,23 +592,23 @@ const getFriendshipStatus = async (userId1, userId2) => {
       OR (requester_id = ? AND addressee_id = ?)`,
       [userId1, userId2, userId2, userId1]
     );
-    
+
     if (!friendship) {
       return { status: 'none' };
     }
-    
+
     if (friendship.status === 'pending') {
       return {
         status: 'pending',
         isPendingOutgoing: friendship.requester_id === userId1,
-        isPendingIncoming: friendship.addressee_id === userId1
+        isPendingIncoming: friendship.addressee_id === userId1,
       };
     }
-    
-    return { 
+
+    return {
       status: friendship.status,
       isBlocked: friendship.status === 'blocked' && friendship.requester_id === userId1,
-      isBlockedBy: friendship.status === 'blocked' && friendship.addressee_id === userId1
+      isBlockedBy: friendship.status === 'blocked' && friendship.addressee_id === userId1,
     };
   } catch (error) {
     logger.error(`Get friendship status error: ${error.message}`);
@@ -632,5 +628,5 @@ module.exports = {
   getFriendSuggestions,
   getUserFriendsIds,
   areFriends,
-  getFriendshipStatus
+  getFriendshipStatus,
 };

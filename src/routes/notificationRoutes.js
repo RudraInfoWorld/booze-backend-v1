@@ -13,60 +13,42 @@ router.use(authenticate);
  * @desc Get user notifications
  * @access Private
  */
-router.get(
-  '/',
-  notificationController.getUserNotifications
-);
+router.get('/', notificationController.getUserNotifications);
 
 /**
  * @route PUT /api/notifications/:notification_id/read
  * @desc Mark notification as read
  * @access Private
  */
-router.put(
-  '/read/:notification_id',
-  notificationController.markNotificationRead
-);
+router.put('/read/:notification_id', notificationController.markNotificationRead);
 
 /**
  * @route PUT /api/notifications/read-all
  * @desc Mark all notifications as read
  * @access Private
  */
-router.put(
-  '/read-all',
-  notificationController.markAllNotificationsRead
-);
+router.put('/read-all', notificationController.markAllNotificationsRead);
 
 /**
  * @route DELETE /api/notifications/:notification_id
  * @desc Delete notification
  * @access Private
  */
-router.delete(
-  '/:notification_id',
-  notificationController.deleteNotification
-);
+router.delete('/:notification_id', notificationController.deleteNotification);
 
 /**
  * @route DELETE /api/notifications
  * @desc Delete all notifications
  * @access Private
  */
-router.delete(
-  '/',
-  notificationController.deleteAllNotifications
-);
+router.delete('/', notificationController.deleteAllNotifications);
 
 /**
  * @route GET /api/notifications/settings
  * @desc Get notification settings
  * @access Private
  */
-router.get(
-  '/settings',
-  notificationController.getNotificationSettings
-);
+router.get('/settings', notificationController.getNotificationSettings);
 
 /**
  * @route PUT /api/notifications/settings
@@ -80,7 +62,7 @@ router.put(
     body('room_invites').optional().isBoolean(),
     body('room_join_requests').optional().isBoolean(),
     body('game_invites').optional().isBoolean(),
-    body('system_notifications').optional().isBoolean()
+    body('system_notifications').optional().isBoolean(),
   ],
   notificationController.updateNotificationSettings
 );
@@ -94,8 +76,11 @@ router.post(
   '/device-token',
   [
     body('device_token').notEmpty().withMessage('Device token is required'),
-    body('device_type').notEmpty().withMessage('Device type is required')
-      .isIn(['ios', 'android', 'web']).withMessage('Device type must be ios, android, or web')
+    body('device_type')
+      .notEmpty()
+      .withMessage('Device type is required')
+      .isIn(['ios', 'android', 'web'])
+      .withMessage('Device type must be ios, android, or web'),
   ],
   notificationController.registerDeviceToken
 );
@@ -107,9 +92,7 @@ router.post(
  */
 router.delete(
   '/device-token',
-  [
-    body('device_token').notEmpty().withMessage('Device token is required')
-  ],
+  [body('device_token').notEmpty().withMessage('Device token is required')],
   notificationController.unregisterDeviceToken
 );
 

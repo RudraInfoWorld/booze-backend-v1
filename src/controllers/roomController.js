@@ -1,7 +1,7 @@
-const { validationResult } = require("express-validator");
-const { catchAsync, AppError } = require("../utils/errorHandler");
-const roomService = require("../services/roomService");
-const logger = require("../config/logger");
+const { validationResult } = require('express-validator');
+const { catchAsync, AppError } = require('../utils/errorHandler');
+const roomService = require('../services/roomService');
+const logger = require('../config/logger');
 
 /**
  * Create room
@@ -11,7 +11,7 @@ const createRoom = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -25,11 +25,11 @@ const createRoom = catchAsync(async (req, res) => {
   const room = await roomService.createRoom(roomData);
 
   res.status(201).json({
-    status: "success",
+    status: 'success',
     data: {
       room,
     },
-    message: "Room created successfully",
+    message: 'Room created successfully',
   });
 });
 
@@ -42,7 +42,7 @@ const getRoomDetails = catchAsync(async (req, res) => {
   const room = await roomService.getRoomDetails(room_id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       room,
     },
@@ -57,7 +57,7 @@ const updateRoom = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -80,11 +80,11 @@ const updateRoom = catchAsync(async (req, res) => {
   const room = await roomService.updateRoom(room_id, updateData, req.user.id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       room,
     },
-    message: "Room updated successfully",
+    message: 'Room updated successfully',
   });
 });
 
@@ -97,8 +97,8 @@ const joinRoom = catchAsync(async (req, res) => {
   await roomService.joinRoom(req.user.id, room_id);
 
   res.status(200).json({
-    status: "success",
-    message: "Joined room successfully",
+    status: 'success',
+    message: 'Joined room successfully',
   });
 });
 
@@ -111,8 +111,8 @@ const leaveRoom = catchAsync(async (req, res) => {
   await roomService.leaveRoom(req.user.id, room_id);
 
   res.status(200).json({
-    status: "success",
-    message: "Left room successfully",
+    status: 'success',
+    message: 'Left room successfully',
   });
 });
 
@@ -130,7 +130,7 @@ const getPublicRooms = catchAsync(async (req, res) => {
   const rooms = await roomService.getPublicRooms(filters, limit, offset);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       rooms,
       count: rooms.length,
@@ -147,7 +147,7 @@ const getUserActiveRooms = catchAsync(async (req, res) => {
   const rooms = await roomService.getUserActiveRooms(req.user.id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       rooms,
       count: rooms.length,
@@ -164,11 +164,11 @@ const requestJoinRoom = catchAsync(async (req, res) => {
   const request = await roomService.createJoinRequest(req.user.id, room_id);
 
   res.status(201).json({
-    status: "success",
+    status: 'success',
     data: {
       request,
     },
-    message: "Join request sent successfully",
+    message: 'Join request sent successfully',
   });
 });
 
@@ -180,7 +180,7 @@ const respondToJoinRequest = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -191,11 +191,11 @@ const respondToJoinRequest = catchAsync(async (req, res) => {
   const request = await roomService.updateJoinRequest(request_id, accept);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       request,
     },
-    message: accept ? "Join request accepted" : "Join request rejected",
+    message: accept ? 'Join request accepted' : 'Join request rejected',
   });
 });
 
@@ -205,13 +205,10 @@ const respondToJoinRequest = catchAsync(async (req, res) => {
 const getPendingJoinRequests = catchAsync(async (req, res) => {
   const { room_id } = req.params;
 
-  const requests = await roomService.getPendingJoinRequests(
-    room_id,
-    req.user.id
-  );
+  const requests = await roomService.getPendingJoinRequests(room_id, req.user.id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       requests,
       count: requests.length,

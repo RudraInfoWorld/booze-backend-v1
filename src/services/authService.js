@@ -7,10 +7,7 @@ const db = require('../config/database');
 const logger = require('../config/logger');
 
 // Initialize Twilio client
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+const twilioClient = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 /**
  * Generate JWT token
@@ -19,7 +16,7 @@ const twilioClient = twilio(
  */
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
@@ -30,7 +27,7 @@ const generateToken = (userId) => {
  */
 const generateRefreshToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
   });
 };
 
@@ -53,9 +50,9 @@ const sendOTP = async (phone, otp) => {
     const message = await twilioClient.messages.create({
       body: `Your Booze app verification code is: ${otp}`,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: phone
+      to: phone,
     });
-    
+
     logger.info(`OTP sent to ${phone}: ${message.sid}`);
     return message;
   } catch (error) {
@@ -73,29 +70,28 @@ const requestOTP = async (phone) => {
   try {
     // Generate OTP
     const otp = generateOTP();
-    
+
     // Calculate expiry time (5 minutes from now)
     const expiryTime = new Date();
     expiryTime.setSeconds(expiryTime.getSeconds() + parseInt(process.env.OTP_EXPIRY_TIME));
-    
-    // Delete any existing OTPs for this phone
-    await db.query(
-      'DELETE FROM otp_codes WHERE phone = ?',
-      [phone]
-    );
-    
-    // Store OTP in database
-    await db.query(
-      'INSERT INTO otp_codes (id, phone, code, expires_at) VALUES (?, ?, ?, ?)',
-      [uuidv4(), phone, otp, expiryTime]
-    );
 
-    // TODO: Uncomment below line to enable sending OTP via SMS    
+    // Delete any existing OTPs for this phone
+    await db.query('DELETE FROM otp_codes WHERE phone = ?', [phone]);
+
+    // Store OTP in database
+    await db.query('INSERT INTO otp_codes (id, phone, code, expires_at) VALUES (?, ?, ?, ?)', [
+      uuidv4(),
+      phone,
+      otp,
+      expiryTime,
+    ]);
+
+    // TODO: Uncomment below line to enable sending OTP via SMS
     // // Send OTP via SMS
     // await sendOTP(phone, otp);
-    
+
     return {
-      expiresAt: expiryTime
+      expiresAt: expiryTime,
     };
   } catch (error) {
     logger.error(`OTP request error: ${error.message}`);
@@ -116,32 +112,26 @@ const verifyOTP = async (phone, otp) => {
       'SELECT id, code, expires_at FROM otp_codes WHERE phone = ? ORDER BY created_at DESC LIMIT 1',
       [phone]
     );
-    
+
     // Check if OTP exists
     if (!otpRecord) {
       throw new AppError('Invalid OTP or OTP expired', 400);
     }
-    
+
     // Check if OTP is expired
     if (new Date() > new Date(otpRecord.expires_at)) {
-      await db.query(
-        'DELETE FROM otp_codes WHERE id = ?',
-        [otpRecord.id]
-      );
+      await db.query('DELETE FROM otp_codes WHERE id = ?', [otpRecord.id]);
       throw new AppError('OTP has expired', 400);
     }
-    
+
     // Check if OTP matches
     if (otpRecord.code !== otp) {
       throw new AppError('Invalid OTP', 400);
     }
-    
+
     // Mark OTP as verified
-    await db.query(
-      'UPDATE otp_codes SET is_verified = TRUE WHERE id = ?',
-      [otpRecord.id]
-    );
-    
+    await db.query('UPDATE otp_codes SET is_verified = TRUE WHERE id = ?', [otpRecord.id]);
+
     return true;
   } catch (error) {
     logger.error(`OTP verification error: ${error.message}`);
@@ -156,46 +146,37 @@ const verifyOTP = async (phone, otp) => {
  */
 const registerWithPhone = async (userData) => {
   const { phone, otp } = userData;
-  
+
   try {
     // Verify OTP
     await verifyOTP(phone, otp);
-    
+
     // Check if user already exists
-    const [existingUser] = await db.query(
-      'SELECT id FROM users WHERE phone = ?',
-      [phone]
-    );
-    
+    const [existingUser] = await db.query('SELECT id FROM users WHERE phone = ?', [phone]);
+
     if (existingUser) {
       throw new AppError('User with this phone number already exists', 400);
     }
-    
+
     // Create user
     const userId = uuidv4();
-    
-    await db.query(
-      'INSERT INTO users (id, phone) VALUES (?, ?)',
-      [userId, phone]
-    );
-    
+
+    await db.query('INSERT INTO users (id, phone) VALUES (?, ?)', [userId, phone]);
+
     // Create default notification settings
-    await db.query(
-      'INSERT INTO notification_settings (user_id) VALUES (?)',
-      [userId]
-    );
-    
+    await db.query('INSERT INTO notification_settings (user_id) VALUES (?)', [userId]);
+
     // Generate tokens
     const token = generateToken(userId);
     const refreshToken = generateRefreshToken(userId);
-    
+
     return {
       user: {
         id: userId,
-        phone
+        phone,
       },
       token,
-      refreshToken
+      refreshToken,
     };
   } catch (error) {
     logger.error(`Registration error: ${error.message}`);
@@ -214,41 +195,48 @@ const loginWithPhone = async (phone, otp, deviceInfo) => {
   try {
     // Verify OTP
     await verifyOTP(phone, otp);
-    
+
     // Get user
     const [user] = await db.query(
       'SELECT id, phone, username, account_status FROM users WHERE phone = ?',
       [phone]
     );
-    
+
     if (!user) {
       throw new AppError('User not found', 404);
     }
-    
+
     if (user.account_status === 'deleted') {
       throw new AppError('This account has been deleted', 400);
     }
-    
+
     // Generate tokens
     const token = generateToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
-    
+
     // Create session
     const sessionId = uuidv4();
     await db.query(
       'INSERT INTO user_sessions (id, user_id, device_name, device_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
-      [sessionId, user.id, deviceInfo.deviceName, deviceInfo.deviceId, deviceInfo.ipAddress, deviceInfo.userAgent]
+      [
+        sessionId,
+        user.id,
+        deviceInfo.deviceName,
+        deviceInfo.deviceId,
+        deviceInfo.ipAddress,
+        deviceInfo.userAgent,
+      ]
     );
-    
+
     return {
       user: {
         id: user.id,
         phone: user.phone,
         username: user.username,
-        status: user.account_status
+        status: user.account_status,
       },
       token,
-      refreshToken
+      refreshToken,
     };
   } catch (error) {
     logger.error(`Login error: ${error.message}`);
@@ -263,77 +251,82 @@ const loginWithPhone = async (phone, otp, deviceInfo) => {
  */
 const loginWithSocial = async (socialData, deviceInfo) => {
   const { provider, providerId, email, name } = socialData;
-  
+
   try {
     // Check if user exists by provider and providerId
     let [user] = await db.query(
       'SELECT id, email, username, account_status FROM users WHERE auth_provider = ? AND auth_provider_id = ?',
       [provider, providerId]
     );
-    
+
     // If no user found but email exists, check by email
     if (!user && email) {
       [user] = await db.query(
         'SELECT id, email, username, account_status FROM users WHERE email = ?',
         [email]
       );
-      
+
       // If user found by email, update their provider info
       if (user) {
-        await db.query(
-          'UPDATE users SET auth_provider = ?, auth_provider_id = ? WHERE id = ?',
-          [provider, providerId, user.id]
-        );
+        await db.query('UPDATE users SET auth_provider = ?, auth_provider_id = ? WHERE id = ?', [
+          provider,
+          providerId,
+          user.id,
+        ]);
       }
     }
-    
+
     // If still no user, create a new one
     if (!user) {
       const userId = uuidv4();
-      
+
       await db.query(
         'INSERT INTO users (id, email, auth_provider, auth_provider_id) VALUES (?, ?, ?, ?)',
         [userId, email, provider, providerId]
       );
-      
+
       // Create default notification settings
-      await db.query(
-        'INSERT INTO notification_settings (user_id) VALUES (?)',
-        [userId]
-      );
-      
+      await db.query('INSERT INTO notification_settings (user_id) VALUES (?)', [userId]);
+
       user = {
         id: userId,
         email,
         username: null,
-        account_status: 'active'
+        account_status: 'active',
       };
     }
-    
+
     if (user.account_status === 'deleted') {
       throw new AppError('This account has been deleted', 400);
     }
-    
+
     // Generate tokens
     const token = generateToken(user.id);
     const refreshToken = generateRefreshToken(user.id);
-    
+
     // Create session
     const sessionId = uuidv4();
     await db.query(
       'INSERT INTO user_sessions (id, user_id, device_name, device_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?)',
-      [sessionId, user.id, deviceInfo.deviceName, deviceInfo.deviceId, deviceInfo.ipAddress, deviceInfo.userAgent]
+      [
+        sessionId,
+        user.id,
+        deviceInfo.deviceName,
+        deviceInfo.deviceId,
+        deviceInfo.ipAddress,
+        deviceInfo.userAgent,
+      ]
     );
-    
+
     return {
       user: {
         id: user.id,
         email: user.email,
         username: user.username,
-        status: user.account_status
+        status: user.account_status,
       },
       token,
-      refreshToken
+      refreshToken,
     };
   } catch (error) {
     logger.error(`Social login error: ${error.message}`);
@@ -350,24 +343,24 @@ const refreshToken = async (refreshToken) => {
   try {
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    
+
     // Check if user exists
     const [user] = await db.query(
       'SELECT id FROM users WHERE id = ? AND account_status != "deleted"',
       [decoded.id]
     );
-    
+
     if (!user) {
       throw new AppError('Invalid refresh token', 401);
     }
-    
+
     // Generate new tokens
     const token = generateToken(user.id);
     const newRefreshToken = generateRefreshToken(user.id);
-    
+
     return {
       token,
-      refreshToken: newRefreshToken
+      refreshToken: newRefreshToken,
     };
   } catch (error) {
     logger.error(`Token refresh error: ${error.message}`);
@@ -391,12 +384,9 @@ const logout = async (userId, deviceId) => {
       );
     } else {
       // Invalidate all sessions for this user
-      await db.query(
-        'UPDATE user_sessions SET is_active = FALSE WHERE user_id = ?',
-        [userId]
-      );
+      await db.query('UPDATE user_sessions SET is_active = FALSE WHERE user_id = ?', [userId]);
     }
-    
+
     return true;
   } catch (error) {
     logger.error(`Logout error: ${error.message}`);
@@ -419,7 +409,7 @@ const getLoginActivity = async (userId) => {
       ORDER BY last_active_time DESC`,
       [userId]
     );
-    
+
     return sessions;
   } catch (error) {
     logger.error(`Get login activity error: ${error.message}`);
@@ -445,5 +435,5 @@ module.exports = {
   refreshToken,
   logout,
   getLoginActivity,
-  switchAccount
+  switchAccount,
 };

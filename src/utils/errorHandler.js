@@ -26,5 +26,5 @@ const catchAsync = (fn) => {
 
 module.exports = {
   AppError,
-  catchAsync
+  catchAsync,
 };

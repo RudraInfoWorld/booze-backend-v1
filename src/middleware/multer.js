@@ -2,7 +2,7 @@ const multer = require('multer');
 
 const storage = multer.memoryStorage();
 
-const uploadImage = multer({ 
+const uploadImage = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: function (req, file, cb) {
@@ -11,7 +11,7 @@ const uploadImage = multer({
       return cb(new Error('Only image files are allowed!'), false);
     }
     cb(null, true);
-  }
+  },
 });
 
 // Multer middleware for document upload
@@ -23,7 +23,7 @@ const uploadDocs = multer({
       return cb(new Error('Only document files are allowed!'), false);
     }
     cb(null, true);
-  }
+  },
 });
 
 // Multer middleware for video/audio files upload
@@ -35,11 +35,11 @@ const uploadMedia = multer({
       return cb(new Error('Only video/audio files are allowed for recordings!'), false);
     }
     cb(null, true);
-  }
+  },
 });
 
 module.exports = {
   uploadImage,
   uploadDocs,
-  uploadMedia
+  uploadMedia,
 };

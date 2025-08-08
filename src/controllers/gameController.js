@@ -1,8 +1,8 @@
-const { validationResult } = require("express-validator");
-const { catchAsync, AppError } = require("../utils/errorHandler");
-const gameService = require("../services/gameService");
-const logger = require("../config/logger");
-const { uploadMediaToCloudinary, deleteMediaFromCloudinary } = require("../middleware/cloudinary");
+const { validationResult } = require('express-validator');
+const { catchAsync, AppError } = require('../utils/errorHandler');
+const gameService = require('../services/gameService');
+const logger = require('../config/logger');
+const { uploadMediaToCloudinary, deleteMediaFromCloudinary } = require('../middleware/cloudinary');
 
 /**
  * Create game
@@ -11,7 +11,7 @@ const createGame = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -19,13 +19,13 @@ const createGame = catchAsync(async (req, res) => {
   const isGameExists = await gameService.checkGameExists(req.body.name);
 
   if (isGameExists) {
-    throw new AppError("Game already exists", 400);
+    throw new AppError('Game already exists', 400);
   }
- let result 
-  if(req.file) {
-    result = await uploadMediaToCloudinary(req.file, "gameDocs");
+  let result;
+  if (req.file) {
+    result = await uploadMediaToCloudinary(req.file, 'gameDocs');
   }
-  const { public_id = null ,  url = null  } = result || {};
+  const { public_id = null, url = null } = result || {};
 
   const gameObj = {
     ...req.body,
@@ -36,9 +36,9 @@ const createGame = catchAsync(async (req, res) => {
   const games = await gameService.createGames(gameObj);
 
   res.status(201).json({
-    status: "success",
+    status: 'success',
     data: games,
-    message: "Games created successfully",
+    message: 'Games created successfully',
   });
 });
 
@@ -49,7 +49,7 @@ const updateGame = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -57,30 +57,30 @@ const updateGame = catchAsync(async (req, res) => {
   const isGameExists = await gameService.getGameById(req.params.game_id);
 
   if (!isGameExists) {
-    throw new AppError("Game Not Exits", 400);
+    throw new AppError('Game Not Exits', 400);
   }
 
   const gameObj = {
-    ...req.body
+    ...req.body,
   };
 
-  if(req.file) {
+  if (req.file) {
     const { rules_id } = isGameExists;
-    if(rules_id ) {
+    if (rules_id) {
       await deleteMediaFromCloudinary(rules_id);
     }
-    const result = await uploadMediaToCloudinary(req.file, "gameDocs");
-    const { public_id = null ,  url = null  } = result || {};
-    if(public_id) gameObj.rules = url;
-    if(url) gameObj.rules_id = public_id;
+    const result = await uploadMediaToCloudinary(req.file, 'gameDocs');
+    const { public_id = null, url = null } = result || {};
+    if (public_id) gameObj.rules = url;
+    if (url) gameObj.rules_id = public_id;
   }
 
   const games = await gameService.updateGame(req.params.game_id, gameObj);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: games,
-    message: "Game updated successfully",
+    message: 'Game updated successfully',
   });
 });
 
@@ -91,25 +91,25 @@ const deleteGame = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
   const isGameExists = await gameService.getGameById(req.params.game_id);
 
   if (!isGameExists) {
-    throw new AppError("Game Not Exits", 400);
+    throw new AppError('Game Not Exits', 400);
   }
 
   const { rules_id } = isGameExists;
-  if(rules_id ) {
+  if (rules_id) {
     await deleteMediaFromCloudinary(rules_id);
   }
 
   await gameService.deleteGame(req.params.game_id);
   res.status(200).json({
-    status: "success",
-    message: "Game deleted successfully",
+    status: 'success',
+    message: 'Game deleted successfully',
   });
 });
 
@@ -120,7 +120,7 @@ const getGames = catchAsync(async (req, res) => {
   const games = await gameService.getGames();
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       games,
       count: games.length,
@@ -137,7 +137,7 @@ const getGameById = catchAsync(async (req, res) => {
   const game = await gameService.getGameById(game_id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       game,
     },
@@ -152,7 +152,7 @@ const createGameSession = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -166,11 +166,11 @@ const createGameSession = catchAsync(async (req, res) => {
   const session = await gameService.createGameSession(sessionData);
 
   res.status(201).json({
-    status: "success",
+    status: 'success',
     data: {
       session,
     },
-    message: "Game session created successfully",
+    message: 'Game session created successfully',
   });
 });
 
@@ -183,7 +183,7 @@ const getGameSession = catchAsync(async (req, res) => {
   const session = await gameService.getGameSession(session_id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       session,
     },
@@ -199,11 +199,11 @@ const joinGameSession = catchAsync(async (req, res) => {
   const session = await gameService.joinGameSession(session_id, req.user.id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       session,
     },
-    message: "Joined game session successfully",
+    message: 'Joined game session successfully',
   });
 });
 
@@ -216,8 +216,8 @@ const leaveGameSession = catchAsync(async (req, res) => {
   await gameService.leaveGameSession(session_id, req.user.id);
 
   res.status(200).json({
-    status: "success",
-    message: "Left game session successfully",
+    status: 'success',
+    message: 'Left game session successfully',
   });
 });
 
@@ -230,8 +230,8 @@ const endGameSession = catchAsync(async (req, res) => {
   await gameService.endGameSession(session_id, req.user.id);
 
   res.status(200).json({
-    status: "success",
-    message: "Game session ended successfully",
+    status: 'success',
+    message: 'Game session ended successfully',
   });
 });
 
@@ -243,7 +243,7 @@ const updatePlayerScore = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -251,18 +251,14 @@ const updatePlayerScore = catchAsync(async (req, res) => {
   const { session_id, user_id } = req.params;
   const { score } = req.body;
 
-  const result = await gameService.updatePlayerScore(
-    session_id,
-    user_id,
-    score
-  );
+  const result = await gameService.updatePlayerScore(session_id, user_id, score);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       player: result,
     },
-    message: "Player score updated successfully",
+    message: 'Player score updated successfully',
   });
 });
 
@@ -275,7 +271,7 @@ const getActiveGameSessionsInRoom = catchAsync(async (req, res) => {
   const sessions = await gameService.getActiveGameSessionsInRoom(room_id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       sessions,
       count: sessions.length,
@@ -291,7 +287,7 @@ const inviteToGame = catchAsync(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      status: "error",
+      status: 'error',
       errors: errors.array(),
     });
   }
@@ -302,8 +298,8 @@ const inviteToGame = catchAsync(async (req, res) => {
   await gameService.inviteToGame(session_id, req.user.id, user_id);
 
   res.status(200).json({
-    status: "success",
-    message: "Game invitation sent successfully",
+    status: 'success',
+    message: 'Game invitation sent successfully',
   });
 });
 

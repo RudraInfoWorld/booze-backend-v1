@@ -10,22 +10,22 @@ const getUserNotifications = catchAsync(async (req, res) => {
   const limit = parseInt(req.query.limit) || 20;
   const offset = parseInt(req.query.offset) || 0;
   const unreadOnly = req.query.unread === 'true';
-  
+
   const notifications = await notificationService.getUserNotifications(
-    req.user.id, 
-    limit, 
-    offset, 
+    req.user.id,
+    limit,
+    offset,
     unreadOnly
   );
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       notifications,
       count: notifications.length,
       limit,
-      offset
-    }
+      offset,
+    },
   });
 });
 
@@ -34,12 +34,12 @@ const getUserNotifications = catchAsync(async (req, res) => {
  */
 const markNotificationRead = catchAsync(async (req, res) => {
   const { notification_id } = req.params;
-  
+
   await notificationService.markNotificationRead(notification_id, req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'Notification marked as read'
+    message: 'Notification marked as read',
   });
 });
 
@@ -48,13 +48,13 @@ const markNotificationRead = catchAsync(async (req, res) => {
  */
 const markAllNotificationsRead = catchAsync(async (req, res) => {
   const count = await notificationService.markAllNotificationsRead(req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      count
+      count,
     },
-    message: 'All notifications marked as read'
+    message: 'All notifications marked as read',
   });
 });
 
@@ -63,12 +63,12 @@ const markAllNotificationsRead = catchAsync(async (req, res) => {
  */
 const deleteNotification = catchAsync(async (req, res) => {
   const { notification_id } = req.params;
-  
+
   await notificationService.deleteNotification(notification_id, req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'Notification deleted'
+    message: 'Notification deleted',
   });
 });
 
@@ -77,13 +77,13 @@ const deleteNotification = catchAsync(async (req, res) => {
  */
 const deleteAllNotifications = catchAsync(async (req, res) => {
   const count = await notificationService.deleteAllNotifications(req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      count
+      count,
     },
-    message: 'All notifications deleted'
+    message: 'All notifications deleted',
   });
 });
 
@@ -92,12 +92,12 @@ const deleteAllNotifications = catchAsync(async (req, res) => {
  */
 const getNotificationSettings = catchAsync(async (req, res) => {
   const settings = await notificationService.getNotificationSettings(req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      settings
-    }
+      settings,
+    },
   });
 });
 
@@ -110,33 +110,36 @@ const updateNotificationSettings = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const settings = {
     friend_requests: req.body.friend_requests,
     room_invites: req.body.room_invites,
     room_join_requests: req.body.room_join_requests,
     game_invites: req.body.game_invites,
-    system_notifications: req.body.system_notifications
+    system_notifications: req.body.system_notifications,
   };
-  
+
   // Remove undefined fields
-  Object.keys(settings).forEach(key => {
+  Object.keys(settings).forEach((key) => {
     if (settings[key] === undefined) {
       delete settings[key];
     }
   });
-  
-  const updatedSettings = await notificationService.updateNotificationSettings(req.user.id, settings);
-  
+
+  const updatedSettings = await notificationService.updateNotificationSettings(
+    req.user.id,
+    settings
+  );
+
   res.status(200).json({
     status: 'success',
     data: {
-      settings: updatedSettings
+      settings: updatedSettings,
     },
-    message: 'Notification settings updated'
+    message: 'Notification settings updated',
   });
 });
 
@@ -149,17 +152,17 @@ const registerDeviceToken = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { device_token, device_type } = req.body;
-  
+
   await notificationService.registerDeviceToken(req.user.id, device_token, device_type);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'Device token registered successfully'
+    message: 'Device token registered successfully',
   });
 });
 
@@ -172,17 +175,17 @@ const unregisterDeviceToken = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { device_token } = req.body;
-  
+
   await notificationService.unregisterDeviceToken(device_token);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'Device token unregistered successfully'
+    message: 'Device token unregistered successfully',
   });
 });
 
@@ -195,5 +198,5 @@ module.exports = {
   getNotificationSettings,
   updateNotificationSettings,
   registerDeviceToken,
-  unregisterDeviceToken
+  unregisterDeviceToken,
 };

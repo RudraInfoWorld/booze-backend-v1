@@ -2,7 +2,7 @@ const express = require('express');
 const { body } = require('express-validator');
 const userController = require('../controllers/userController');
 const { authenticate } = require('../middleware/auth');
-const {uploadImage} = require('../middleware/multer')
+const { uploadImage } = require('../middleware/multer');
 const router = express.Router();
 
 /**
@@ -10,22 +10,14 @@ const router = express.Router();
  * @desc Get user profile
  * @access Private
  */
-router.get(
-  '/profile',
-  authenticate,
-  userController.getProfile
-);
+router.get('/profile', authenticate, userController.getProfile);
 
 /**
  * @route GET /api/users/check-username
  * @desc Check username availability
  * @access Private
  */
-router.get(
-  '/check-username',
-  authenticate,
-  userController.checkUsername
-);
+router.get('/check-username', authenticate, userController.checkUsername);
 
 /**
  * @route PUT /api/users/profile
@@ -37,17 +29,22 @@ router.put(
   authenticate,
   [
     body('email').optional().isEmail().withMessage('Invalid email'),
-    body('username').optional()
-      .isLength({ min: 3, max: 20 }).withMessage('Username must be between 3 and 20 characters')
-      .matches(/^[a-zA-Z0-9_]+$/).withMessage('Username can only contain letters, numbers and underscore'),
-    body('bio').optional()
-      .isLength({ max: 500 }).withMessage('Bio cannot exceed 500 characters'),
-    body('interests').optional()
-      .isArray().withMessage('Interests must be an array'),
-    body('vibe_preference').optional()
-      .isIn(['chill', 'moderate', 'party']).withMessage('Invalid vibe preference'),
-    body('mode_preference').optional()
-      .isIn(['light', 'dark' , 'party']).withMessage('Invalid mode preference')
+    body('username')
+      .optional()
+      .isLength({ min: 3, max: 20 })
+      .withMessage('Username must be between 3 and 20 characters')
+      .matches(/^[a-zA-Z0-9_]+$/)
+      .withMessage('Username can only contain letters, numbers and underscore'),
+    body('bio').optional().isLength({ max: 500 }).withMessage('Bio cannot exceed 500 characters'),
+    body('interests').optional().isArray().withMessage('Interests must be an array'),
+    body('vibe_preference')
+      .optional()
+      .isIn(['chill', 'moderate', 'party'])
+      .withMessage('Invalid vibe preference'),
+    body('mode_preference')
+      .optional()
+      .isIn(['light', 'dark', 'party'])
+      .withMessage('Invalid mode preference'),
   ],
   userController.updateProfile
 );
@@ -64,7 +61,6 @@ router.post(
   userController.uploadProfilePicture
 );
 
-
 /**
  * @route PUT /api/users/status
  * @desc Update account status
@@ -74,8 +70,11 @@ router.put(
   '/status',
   authenticate,
   [
-    body('status').notEmpty().withMessage('Status is required')
-      .isIn(['active','ghost','private']).withMessage('Invalid status')
+    body('status')
+      .notEmpty()
+      .withMessage('Status is required')
+      .isIn(['active', 'ghost', 'private'])
+      .withMessage('Invalid status'),
   ],
   userController.updateAccountStatus
 );
@@ -85,32 +84,20 @@ router.put(
  * @desc Delete account
  * @access Private
  */
-router.delete(
-  '/account',
-  authenticate,
-  userController.deleteAccount
-);
+router.delete('/account', authenticate, userController.deleteAccount);
 
 /**
  * @route GET /api/users/search
  * @desc Search users
  * @access Private
  */
-router.get(
-  '/search',
-  authenticate,
-  userController.searchUsers
-);
+router.get('/search', authenticate, userController.searchUsers);
 
 /**
  * @route GET /api/users/:username
  * @desc Get user by username
  * @access Private
  */
-router.get(
-  '/:username',
-  authenticate,
-  userController.getUserByUsername
-);
+router.get('/:username', authenticate, userController.getUserByUsername);
 
 module.exports = router;

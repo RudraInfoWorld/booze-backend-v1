@@ -1,5 +1,5 @@
 const express = require('express');
-const { body , query  } = require('express-validator');
+const { body, query } = require('express-validator');
 const mediaController = require('../controllers/mediaController');
 const { authenticate } = require('../middleware/auth');
 const { uploadImage, uploadMedia } = require('../middleware/multer');
@@ -12,10 +12,10 @@ router.use(authenticate);
 // Dynamic middleware selector
 function mediaUploadMiddleware(req, res, next) {
   const type = req.query.type;
-  if(!type) {
+  if (!type) {
     return res.status(400).json({ error: 'Media type is required' });
   }
-  
+
   if (type === 'screenshot') {
     uploadImage.single('file')(req, res, next);
   } else if (type === 'recording') {
@@ -35,8 +35,11 @@ router.post(
   mediaUploadMiddleware,
   [
     body('room_id').notEmpty().withMessage('Room ID is required'),
-    query('type').notEmpty().withMessage('Media type is required')
-      .isIn(['screenshot', 'recording']).withMessage('Media type must be screenshot or recording')
+    query('type')
+      .notEmpty()
+      .withMessage('Media type is required')
+      .isIn(['screenshot', 'recording'])
+      .withMessage('Media type must be screenshot or recording'),
   ],
   mediaController.storeMedia
 );
@@ -46,29 +49,20 @@ router.post(
  * @desc Get user's media records
  * @access Private
  */
-router.get(
-  '/user',
-  mediaController.getUserMediaRecords
-);
+router.get('/user', mediaController.getUserMediaRecords);
 
 /**
  * @route GET /api/media/rooms/:room_id
  * @desc Get room media records
  * @access Private
  */
-router.get(
-  '/rooms/:room_id',
-  mediaController.getRoomMediaRecords
-);
+router.get('/rooms/:room_id', mediaController.getRoomMediaRecords);
 
 /**
  * @route DELETE /api/media/:media_id
  * @desc Delete media record
  * @access Private
  */
-router.delete(
-  '/:media_id',
-  mediaController.deleteMedia
-);
+router.delete('/:media_id', mediaController.deleteMedia);
 
 module.exports = router;

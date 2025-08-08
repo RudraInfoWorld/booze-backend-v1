@@ -1,8 +1,8 @@
-const { v4: uuidv4 } = require("uuid");
-const { AppError } = require("../utils/errorHandler");
-const db = require("../config/database");
-const logger = require("../config/logger");
-const socket = require("../config/socket");
+const { v4: uuidv4 } = require('uuid');
+const { AppError } = require('../utils/errorHandler');
+const db = require('../config/database');
+const logger = require('../config/logger');
+const socket = require('../config/socket');
 
 // This will be lazy-loaded to avoid circular dependency
 let notificationService;
@@ -13,24 +13,18 @@ let notificationService;
  */
 const createGames = async (gameData) => {
   try {
-    const { name, description, rules, rules_id, min_players, max_players } =
-      gameData;
+    const { name, description, rules, rules_id, min_players, max_players } = gameData;
 
     // Validate required fields
     if (!name || !min_players || !max_players) {
-      throw new AppError(
-        "Name, min_players, and max_players are required",
-        400
-      );
+      throw new AppError('Name, min_players, and max_players are required', 400);
     }
 
     // Check if game exists
-    const [game] = await db.query(
-      `SELECT id FROM games WHERE name like '${name}'`
-    );
+    const [game] = await db.query(`SELECT id FROM games WHERE name like '${name}'`);
 
     if (game) {
-      throw new AppError("Game Already Exists", 404);
+      throw new AppError('Game Already Exists', 404);
     }
 
     // Create game
@@ -58,57 +52,53 @@ const createGames = async (gameData) => {
 
 const updateGame = async (gameId, gameData) => {
   try {
-    const { name, description, rules, rules_id, min_players, max_players } =
-      gameData;
+    const { name, description, rules, rules_id, min_players, max_players } = gameData;
 
+    if (name) {
+      const [game] = await db.query(`SELECT id FROM games WHERE name like '${name}'`);
 
-      if(name) {
-        const [game] = await db.query(
-          `SELECT id FROM games WHERE name like '${name}'`
-        );
-
-        if (game) {
-          throw new AppError("Game Already Exists", 404);
-        }
+      if (game) {
+        throw new AppError('Game Already Exists', 404);
       }
+    }
 
     // Create update query
-    let updateQuery = "UPDATE games SET ";
+    let updateQuery = 'UPDATE games SET ';
     const updateValues = [];
     const updateFields = [];
 
     if (name !== undefined) {
-      updateFields.push("name = ?");
+      updateFields.push('name = ?');
       updateValues.push(name);
     }
 
     if (description !== undefined) {
-      updateFields.push("description = ?");
+      updateFields.push('description = ?');
       updateValues.push(description);
     }
 
     if (rules !== undefined) {
-      updateFields.push("rules = ?");
+      updateFields.push('rules = ?');
       updateValues.push(rules);
     }
 
     if (rules_id !== undefined) {
-      updateFields.push("rules_id = ?");
+      updateFields.push('rules_id = ?');
       updateValues.push(rules_id);
     }
 
     if (min_players !== undefined) {
-      updateFields.push("min_players = ?");
+      updateFields.push('min_players = ?');
       updateValues.push(min_players);
     }
 
     if (max_players !== undefined) {
-      updateFields.push("max_players = ?");
+      updateFields.push('max_players = ?');
       updateValues.push(max_players);
     }
 
-    updateQuery += updateFields.join(", ");
-    updateQuery += " WHERE id = ?";
+    updateQuery += updateFields.join(', ');
+    updateQuery += ' WHERE id = ?';
     updateValues.push(gameId);
     // Update user
     await db.query(updateQuery, updateValues);
@@ -135,7 +125,7 @@ const deleteGame = async (gameId) => {
     }
 
     // Delete game
-    await db.query("DELETE FROM games WHERE id = ?", [gameId]);
+    await db.query('DELETE FROM games WHERE id = ?', [gameId]);
 
     return true;
   } catch (error) {
@@ -151,9 +141,7 @@ const deleteGame = async (gameId) => {
  */
 const checkGameExists = async (game_name) => {
   try {
-    const [game] = await db.query(
-      `SELECT id FROM games WHERE name like '${game_name}%'`
-    );
+    const [game] = await db.query(`SELECT id FROM games WHERE name like '${game_name}%'`);
 
     return !!game;
   } catch (error) {
@@ -169,13 +157,13 @@ const checkGameExists = async (game_name) => {
 const getGames = async () => {
   try {
     const games = await db.query(
-      "SELECT id, name, description, rules, rules_id , min_players, max_players FROM games"
+      'SELECT id, name, description, rules, rules_id , min_players, max_players FROM games'
     );
 
     return games;
   } catch (error) {
     logger.error(`Get games error: ${error.message}`);
-    throw new AppError("Failed to get games", 500);
+    throw new AppError('Failed to get games', 500);
   }
 };
 
@@ -187,12 +175,12 @@ const getGames = async () => {
 const getGameById = async (gameId) => {
   try {
     const [game] = await db.query(
-      "SELECT id, name, description, rules, rules_id , min_players, max_players FROM games WHERE id = ?",
+      'SELECT id, name, description, rules, rules_id , min_players, max_players FROM games WHERE id = ?',
       [gameId]
     );
 
     if (!game) {
-      throw new AppError("Game not found", 404);
+      throw new AppError('Game not found', 404);
     }
 
     return game;
@@ -213,36 +201,33 @@ const createGameSession = async (sessionData) => {
 
     // Validate required fields
     if (!gameId || !roomId || !createdBy) {
-      throw new AppError("Game ID, room ID, and creator ID are required", 400);
+      throw new AppError('Game ID, room ID, and creator ID are required', 400);
     }
 
     // Check if game exists
-    const [game] = await db.query(
-      "SELECT id, min_players, max_players FROM games WHERE id = ?",
-      [gameId]
-    );
+    const [game] = await db.query('SELECT id, min_players, max_players FROM games WHERE id = ?', [
+      gameId,
+    ]);
 
     if (!game) {
-      throw new AppError("Game not found", 404);
+      throw new AppError('Game not found', 404);
     }
 
     // Check if room exists
-    const [room] = await db.query("SELECT id FROM rooms WHERE id = ?", [
-      roomId,
-    ]);
+    const [room] = await db.query('SELECT id FROM rooms WHERE id = ?', [roomId]);
 
     if (!room) {
-      throw new AppError("Room not found", 404);
+      throw new AppError('Room not found', 404);
     }
 
     // Check if user is in room
     const [participant] = await db.query(
-      "SELECT id FROM room_participants WHERE room_id = ? AND user_id = ? AND is_active = TRUE",
+      'SELECT id FROM room_participants WHERE room_id = ? AND user_id = ? AND is_active = TRUE',
       [roomId, createdBy]
     );
 
     if (!participant) {
-      throw new AppError("You must be in the room to start a game", 403);
+      throw new AppError('You must be in the room to start a game', 403);
     }
 
     // Check for active game session of the same game in the room
@@ -253,10 +238,7 @@ const createGameSession = async (sessionData) => {
     );
 
     if (activeSession) {
-      throw new AppError(
-        "A session of this game is already active in this room",
-        400
-      );
+      throw new AppError('A session of this game is already active in this room', 400);
     }
 
     // Create game session
@@ -271,7 +253,7 @@ const createGameSession = async (sessionData) => {
 
     // Add creator as first participant
     await db.query(
-      "INSERT INTO game_participants (id, game_session_id, user_id) VALUES (?, ?, ?)",
+      'INSERT INTO game_participants (id, game_session_id, user_id) VALUES (?, ?, ?)',
       [uuidv4(), sessionId, createdBy]
     );
 
@@ -302,7 +284,7 @@ const getGameSession = async (sessionId) => {
     );
 
     if (!session) {
-      throw new AppError("Game session not found", 404);
+      throw new AppError('Game session not found', 404);
     }
 
     // Get participants
@@ -359,26 +341,26 @@ const joinGameSession = async (sessionId, userId) => {
     );
 
     if (!session) {
-      throw new AppError("Game session not found", 404);
+      throw new AppError('Game session not found', 404);
     }
 
-    if (session.status !== "active") {
-      throw new AppError("Game session is not active", 400);
+    if (session.status !== 'active') {
+      throw new AppError('Game session is not active', 400);
     }
 
     // Check if user is in the room
     const [participant] = await db.query(
-      "SELECT id FROM room_participants WHERE room_id = ? AND user_id = ? AND is_active = TRUE",
+      'SELECT id FROM room_participants WHERE room_id = ? AND user_id = ? AND is_active = TRUE',
       [session.room_id, userId]
     );
 
     if (!participant) {
-      throw new AppError("You must be in the room to join the game", 403);
+      throw new AppError('You must be in the room to join the game', 403);
     }
 
     // Check if user is already in the game
     const [gameParticipant] = await db.query(
-      "SELECT id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL",
+      'SELECT id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL',
       [sessionId, userId]
     );
 
@@ -389,31 +371,30 @@ const joinGameSession = async (sessionId, userId) => {
 
     // Check if game is full
     const [participantCount] = await db.query(
-      "SELECT COUNT(*) as count FROM game_participants WHERE game_session_id = ? AND left_at IS NULL",
+      'SELECT COUNT(*) as count FROM game_participants WHERE game_session_id = ? AND left_at IS NULL',
       [sessionId]
     );
 
     if (participantCount.count >= session.max_players) {
-      throw new AppError("Game is full", 400);
+      throw new AppError('Game is full', 400);
     }
 
     // Add user to game
     await db.query(
-      "INSERT INTO game_participants (id, game_session_id, user_id) VALUES (?, ?, ?)",
+      'INSERT INTO game_participants (id, game_session_id, user_id) VALUES (?, ?, ?)',
       [uuidv4(), sessionId, userId]
     );
 
     // Emit player joined event
     try {
-      const [user] = await db.query(
-        "SELECT username, profile_picture FROM users WHERE id = ?",
-        [userId]
-      );
+      const [user] = await db.query('SELECT username, profile_picture FROM users WHERE id = ?', [
+        userId,
+      ]);
 
       socket
         .getIO()
         .to(`room:${session.room_id}`)
-        .emit("game-player-joined", {
+        .emit('game-player-joined', {
           sessionId,
           player: {
             id: userId,
@@ -442,18 +423,17 @@ const joinGameSession = async (sessionId, userId) => {
 const leaveGameSession = async (sessionId, userId) => {
   try {
     // Check if session exists
-    const [session] = await db.query(
-      "SELECT id, room_id, status FROM game_sessions WHERE id = ?",
-      [sessionId]
-    );
+    const [session] = await db.query('SELECT id, room_id, status FROM game_sessions WHERE id = ?', [
+      sessionId,
+    ]);
 
     if (!session) {
-      throw new AppError("Game session not found", 404);
+      throw new AppError('Game session not found', 404);
     }
 
     // Check if user is in the game
     const [participant] = await db.query(
-      "SELECT id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL",
+      'SELECT id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL',
       [sessionId, userId]
     );
 
@@ -462,28 +442,25 @@ const leaveGameSession = async (sessionId, userId) => {
     }
 
     // Mark participant as left
-    await db.query(
-      "UPDATE game_participants SET left_at = NOW() WHERE id = ?",
-      [participant.id]
-    );
+    await db.query('UPDATE game_participants SET left_at = NOW() WHERE id = ?', [participant.id]);
 
     // Check if there are any participants left
     const [participantCount] = await db.query(
-      "SELECT COUNT(*) as count FROM game_participants WHERE game_session_id = ? AND left_at IS NULL",
+      'SELECT COUNT(*) as count FROM game_participants WHERE game_session_id = ? AND left_at IS NULL',
       [sessionId]
     );
 
     // If no participants left, end the game session
-    if (participantCount.count === 0 && session.status === "active") {
-      await db.query(
-        "UPDATE game_sessions SET status = ?, ended_at = NOW() WHERE id = ?",
-        ["completed", sessionId]
-      );
+    if (participantCount.count === 0 && session.status === 'active') {
+      await db.query('UPDATE game_sessions SET status = ?, ended_at = NOW() WHERE id = ?', [
+        'completed',
+        sessionId,
+      ]);
     }
 
     // Emit player left event
     try {
-      socket.getIO().to(`room:${session.room_id}`).emit("game-player-left", {
+      socket.getIO().to(`room:${session.room_id}`).emit('game-player-left', {
         sessionId,
         userId,
       });
@@ -516,27 +493,24 @@ const endGameSession = async (sessionId, userId) => {
     );
 
     if (!session) {
-      throw new AppError("Game session not found", 404);
+      throw new AppError('Game session not found', 404);
     }
 
-    if (session.status !== "active") {
-      throw new AppError("Game session is already ended", 400);
+    if (session.status !== 'active') {
+      throw new AppError('Game session is already ended', 400);
     }
 
     // Check if user is authorized to end the game
     // Only game creator or room host can end the game
     if (session.created_by !== userId && session.host_id !== userId) {
-      throw new AppError(
-        "Only the game creator or room host can end the game",
-        403
-      );
+      throw new AppError('Only the game creator or room host can end the game', 403);
     }
 
     // End the game session
-    await db.query(
-      "UPDATE game_sessions SET status = ?, ended_at = NOW() WHERE id = ?",
-      ["completed", sessionId]
-    );
+    await db.query('UPDATE game_sessions SET status = ?, ended_at = NOW() WHERE id = ?', [
+      'completed',
+      sessionId,
+    ]);
 
     // Mark all participants as left
     await db.query(
@@ -548,7 +522,7 @@ const endGameSession = async (sessionId, userId) => {
 
     // Emit game ended event
     try {
-      socket.getIO().to(`room:${session.room_id}`).emit("game-ended", {
+      socket.getIO().to(`room:${session.room_id}`).emit('game-ended', {
         sessionId,
         endedBy: userId,
       });
@@ -574,40 +548,40 @@ const updatePlayerScore = async (sessionId, userId, score) => {
   try {
     // Check if session exists and is active
     const [session] = await db.query(
-      "SELECT id, room_id, status FROM game_sessions WHERE id = ? AND status = ?",
-      [sessionId, "active"]
+      'SELECT id, room_id, status FROM game_sessions WHERE id = ? AND status = ?',
+      [sessionId, 'active']
     );
 
     if (!session) {
-      throw new AppError("Active game session not found", 404);
+      throw new AppError('Active game session not found', 404);
     }
 
     // Check if user is in the game
     const [participant] = await db.query(
-      "SELECT id, score FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL",
+      'SELECT id, score FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL',
       [sessionId, userId]
     );
 
     if (!participant) {
-      throw new AppError("User is not in this game session", 404);
+      throw new AppError('User is not in this game session', 404);
     }
 
     // Validate score
-    if (typeof score !== "number") {
-      throw new AppError("Score must be a number", 400);
+    if (typeof score !== 'number') {
+      throw new AppError('Score must be a number', 400);
     }
 
     // Update score
     const newScore = participant.score + score;
 
-    await db.query("UPDATE game_participants SET score = ? WHERE id = ?", [
+    await db.query('UPDATE game_participants SET score = ? WHERE id = ?', [
       newScore,
       participant.id,
     ]);
 
     // Emit score updated event
     try {
-      socket.getIO().to(`room:${session.room_id}`).emit("game-score-updated", {
+      socket.getIO().to(`room:${session.room_id}`).emit('game-score-updated', {
         sessionId,
         userId,
         newScore,
@@ -653,7 +627,7 @@ const getActiveGameSessionsInRoom = async (roomId) => {
     }));
   } catch (error) {
     logger.error(`Get active game sessions error: ${error.message}`);
-    throw new AppError("Failed to get active game sessions", 500);
+    throw new AppError('Failed to get active game sessions', 500);
   }
 };
 
@@ -668,7 +642,7 @@ const inviteToGame = async (sessionId, inviterId, inviteeId) => {
   try {
     // Lazy load notification service to prevent circular dependency
     if (!notificationService) {
-      notificationService = require("./notificationService");
+      notificationService = require('./notificationService');
     }
 
     // Check if session exists and is active
@@ -677,48 +651,45 @@ const inviteToGame = async (sessionId, inviterId, inviteeId) => {
       FROM game_sessions gs
       JOIN games g ON g.id = gs.game_id
       WHERE gs.id = ? AND gs.status = ?`,
-      [sessionId, "active"]
+      [sessionId, 'active']
     );
 
     if (!session) {
-      throw new AppError("Active game session not found", 404);
+      throw new AppError('Active game session not found', 404);
     }
 
     // Check if inviter is in the game
     const [inviter] = await db.query(
-      "SELECT user_id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL",
+      'SELECT user_id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL',
       [sessionId, inviterId]
     );
 
     if (!inviter) {
-      throw new AppError("You must be in the game to invite others", 403);
+      throw new AppError('You must be in the game to invite others', 403);
     }
 
     // Check if invitee is in the room but not in the game
     const [roomParticipant] = await db.query(
-      "SELECT id FROM room_participants WHERE room_id = ? AND user_id = ? AND is_active = TRUE",
+      'SELECT id FROM room_participants WHERE room_id = ? AND user_id = ? AND is_active = TRUE',
       [session.room_id, inviteeId]
     );
 
     if (!roomParticipant) {
-      throw new AppError("User is not in the room", 400);
+      throw new AppError('User is not in the room', 400);
     }
 
     // Check if invitee is already in the game
     const [gameParticipant] = await db.query(
-      "SELECT id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL",
+      'SELECT id FROM game_participants WHERE game_session_id = ? AND user_id = ? AND left_at IS NULL',
       [sessionId, inviteeId]
     );
 
     if (gameParticipant) {
-      throw new AppError("User is already in the game", 400);
+      throw new AppError('User is already in the game', 400);
     }
 
     // Get inviter username
-    const [inviterUser] = await db.query(
-      "SELECT username FROM users WHERE id = ?",
-      [inviterId]
-    );
+    const [inviterUser] = await db.query('SELECT username FROM users WHERE id = ?', [inviterId]);
     // TODO : Send notification to addressee
     // Send notification to invitee
     // await notificationService.createNotification({
@@ -737,7 +708,7 @@ const inviteToGame = async (sessionId, inviterId, inviteeId) => {
 
     // Emit game invite event
     try {
-      socket.emitToUser(inviteeId, "game-invite", {
+      socket.emitToUser(inviteeId, 'game-invite', {
         sessionId,
         roomId: session.room_id,
         gameName: session.game_name,

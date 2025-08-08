@@ -16,10 +16,15 @@ router.use(authenticate);
 router.post(
   '/',
   [
-    body('name').notEmpty().withMessage('Room name is required')
-      .isLength({ min: 3, max: 50 }).withMessage('Room name must be between 3 and 50 characters'),
-    body('type').optional()
-      .isIn(['public', 'private']).withMessage('Room type must be public or private')
+    body('name')
+      .notEmpty()
+      .withMessage('Room name is required')
+      .isLength({ min: 3, max: 50 })
+      .withMessage('Room name must be between 3 and 50 characters'),
+    body('type')
+      .optional()
+      .isIn(['public', 'private'])
+      .withMessage('Room type must be public or private'),
   ],
   roomController.createRoom
 );
@@ -29,10 +34,7 @@ router.post(
  * @desc Get room details
  * @access Private
  */
-router.get(
-  '/:room_id',
-  roomController.getRoomDetails
-);
+router.get('/:room_id', roomController.getRoomDetails);
 
 /**
  * @route PUT /api/rooms/:room_id
@@ -42,12 +44,15 @@ router.get(
 router.put(
   '/:room_id',
   [
-    body('name').optional()
-      .isLength({ min: 3, max: 50 }).withMessage('Room name must be between 3 and 50 characters'),
-    body('type').optional()
-      .isIn(['public', 'private']).withMessage('Room type must be public or private'),
-    body('is_locked').optional()
-      .isBoolean().withMessage('is_locked must be a boolean')
+    body('name')
+      .optional()
+      .isLength({ min: 3, max: 50 })
+      .withMessage('Room name must be between 3 and 50 characters'),
+    body('type')
+      .optional()
+      .isIn(['public', 'private'])
+      .withMessage('Room type must be public or private'),
+    body('is_locked').optional().isBoolean().withMessage('is_locked must be a boolean'),
   ],
   roomController.updateRoom
 );
@@ -57,50 +62,35 @@ router.put(
  * @desc Join room
  * @access Private
  */
-router.get(
-  '/join/:room_id',
-  roomController.joinRoom
-);
+router.get('/join/:room_id', roomController.joinRoom);
 
 /**
  * @route GET /api/rooms/leave/:room_id
  * @desc Leave room
  * @access Private
  */
-router.get(
-  '/leave/:room_id',
-  roomController.leaveRoom
-);
+router.get('/leave/:room_id', roomController.leaveRoom);
 
 /**
  * @route GET /api/rooms
  * @desc Get public rooms
  * @access Private
  */
-router.get(
-  '/',
-  roomController.getPublicRooms
-);
+router.get('/', roomController.getPublicRooms);
 
 /**
  * @route GET /api/rooms/user/active
  * @desc Get user's active rooms
  * @access Private
  */
-router.get(
-  '/user/active',
-  roomController.getUserActiveRooms
-);
+router.get('/user/active', roomController.getUserActiveRooms);
 
 /**
  * @route GET /api/rooms/join-request/:room_id
  * @desc Request to join a locked room
  * @access Private
  */
-router.get(
-  '/join-request/:room_id',
-  roomController.requestJoinRoom
-);
+router.get('/join-request/:room_id', roomController.requestJoinRoom);
 
 /**
  * @route PUT /api/rooms/join-request/:request_id
@@ -110,8 +100,11 @@ router.get(
 router.put(
   '/join-request/:request_id',
   [
-    body('accept').notEmpty().withMessage('Accept status is required')
-      .isBoolean().withMessage('Accept status must be a boolean')
+    body('accept')
+      .notEmpty()
+      .withMessage('Accept status is required')
+      .isBoolean()
+      .withMessage('Accept status must be a boolean'),
   ],
   roomController.respondToJoinRequest
 );
@@ -121,9 +114,6 @@ router.put(
  * @desc Get pending join requests for a room
  * @access Private
  */
-router.get(
-  '/:room_id/join-requests',
-  roomController.getPendingJoinRequests
-);
+router.get('/:room_id/join-requests', roomController.getPendingJoinRequests);
 
 module.exports = router;

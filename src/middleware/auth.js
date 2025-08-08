@@ -23,10 +23,9 @@ const authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Check if user still exists
-    const [user] = await db.query(
-      'SELECT id, username, account_status FROM users WHERE id = ?',
-      [decoded.id]
-    );
+    const [user] = await db.query('SELECT id, username, account_status FROM users WHERE id = ?', [
+      decoded.id,
+    ]);
 
     if (!user || user.account_status === 'deleted') {
       return next(new AppError('The user belonging to this token no longer exists.', 401));
@@ -49,7 +48,7 @@ const authenticate = async (req, res, next) => {
     req.user = {
       id: user.id,
       username: user.username,
-      status: user.account_status
+      status: user.account_status,
     };
 
     next();
@@ -67,10 +66,7 @@ const authorize = (...roles) => {
   return async (req, res, next) => {
     try {
       // Get user role from database
-      const [userRole] = await db.query(
-        'SELECT role FROM users WHERE id = ?',
-        [req.user.id]
-      );
+      const [userRole] = await db.query('SELECT role FROM users WHERE id = ?', [req.user.id]);
 
       // Check if user role is in the allowed roles
       if (!roles.includes(userRole?.role)) {
@@ -87,5 +83,5 @@ const authorize = (...roles) => {
 
 module.exports = {
   authenticate,
-  authorize
+  authorize,
 };

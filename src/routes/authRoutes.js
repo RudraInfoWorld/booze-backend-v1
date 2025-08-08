@@ -13,8 +13,11 @@ const router = express.Router();
 router.post(
   '/otp/request',
   [
-    body('phone').notEmpty().withMessage('Phone number is required')
-      .matches(/^\+[1-9]\d{1,14}$/).withMessage('Please provide a valid international phone number with country code')
+    body('phone')
+      .notEmpty()
+      .withMessage('Phone number is required')
+      .matches(/^\+[1-9]\d{1,14}$/)
+      .withMessage('Please provide a valid international phone number with country code'),
   ],
   authController.requestOTP
 );
@@ -27,10 +30,16 @@ router.post(
 router.post(
   '/register/phone',
   [
-    body('phone').notEmpty().withMessage('Phone number is required')
-      .matches(/^\+[1-9]\d{1,14}$/).withMessage('Please provide a valid international phone number with country code'),
-    body('otp').notEmpty().withMessage('OTP is required')
-      .isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+    body('phone')
+      .notEmpty()
+      .withMessage('Phone number is required')
+      .matches(/^\+[1-9]\d{1,14}$/)
+      .withMessage('Please provide a valid international phone number with country code'),
+    body('otp')
+      .notEmpty()
+      .withMessage('OTP is required')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits'),
   ],
   authController.registerWithPhone
 );
@@ -43,14 +52,19 @@ router.post(
 router.post(
   '/login/phone',
   [
-    body('phone').notEmpty().withMessage('Phone number is required')
-      .matches(/^\+[1-9]\d{1,14}$/).withMessage('Please provide a valid international phone number with country code'),
-    body('otp').notEmpty().withMessage('OTP is required')
-      .isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+    body('phone')
+      .notEmpty()
+      .withMessage('Phone number is required')
+      .matches(/^\+[1-9]\d{1,14}$/)
+      .withMessage('Please provide a valid international phone number with country code'),
+    body('otp')
+      .notEmpty()
+      .withMessage('OTP is required')
+      .isLength({ min: 6, max: 6 })
+      .withMessage('OTP must be 6 digits'),
   ],
   authController.loginWithPhone
 );
-
 
 /**
  * @route POST /api/auth/token/refresh
@@ -59,9 +73,7 @@ router.post(
  */
 router.post(
   '/token/refresh',
-  [
-    body('refresh_token').notEmpty().withMessage('Refresh token is required')
-  ],
+  [body('refresh_token').notEmpty().withMessage('Refresh token is required')],
   authController.refreshToken
 );
 
@@ -70,21 +82,13 @@ router.post(
  * @desc Logout
  * @access Private
  */
-router.post(
-  '/logout',
-  authenticate,
-  authController.logout
-);
+router.post('/logout', authenticate, authController.logout);
 
 /**
  * @route GET /api/auth/sessions
  * @desc Get login activity
  * @access Private
  */
-router.get(
-  '/sessions',
-  authenticate,
-  authController.getLoginActivity
-);
+router.get('/sessions', authenticate, authController.getLoginActivity);
 
 module.exports = router;

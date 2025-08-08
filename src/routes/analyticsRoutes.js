@@ -21,10 +21,10 @@ router.get(
   catchAsync(async (req, res) => {
     const days = parseInt(req.query.days) || 7;
     const data = await analyticsService.getDailyActiveUsers(days);
-    
+
     res.status(200).json({
       status: 'success',
-      data
+      data,
     });
   })
 );
@@ -39,10 +39,10 @@ router.get(
   catchAsync(async (req, res) => {
     const days = parseInt(req.query.days) || 7;
     const data = await analyticsService.getGameActivity(days);
-    
+
     res.status(200).json({
       status: 'success',
-      data
+      data,
     });
   })
 );
@@ -57,10 +57,10 @@ router.get(
   catchAsync(async (req, res) => {
     const days = parseInt(req.query.days) || 7;
     const data = await analyticsService.getRoomActivity(days);
-    
+
     res.status(200).json({
       status: 'success',
-      data
+      data,
     });
   })
 );
@@ -75,7 +75,7 @@ router.post(
   catchAsync(async (req, res) => {
     // Track all metrics
     await analyticsService.trackDailyActiveUsers();
-    
+
     // Track game activity for all games if game_id is not provided
     if (req.body.game_id) {
       await analyticsService.trackGameActivity(req.body.game_id);
@@ -85,12 +85,12 @@ router.post(
         await analyticsService.trackGameActivity(game.id);
       }
     }
-    
+
     await analyticsService.trackRoomActivity();
-    
+
     res.status(200).json({
       status: 'success',
-      message: 'Analytics tracked successfully'
+      message: 'Analytics tracked successfully',
     });
   })
 );

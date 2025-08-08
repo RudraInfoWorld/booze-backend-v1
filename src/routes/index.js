@@ -17,7 +17,7 @@ router.get('/health', (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'API is running',
-    timestamp: new Date()
+    timestamp: new Date(),
   });
 });
 
@@ -27,7 +27,7 @@ router.get('/', (req, res) => {
     status: 'success',
     message: 'Welcome to Booze API',
     version: '1.0.0',
-    documentation: 'API documentation will be available here'
+    documentation: 'API documentation will be available here',
   });
 });
 

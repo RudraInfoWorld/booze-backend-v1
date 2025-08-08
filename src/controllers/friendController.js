@@ -12,20 +12,20 @@ const sendFriendRequest = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { addressee_id } = req.body;
-  
+
   const friendship = await friendService.sendFriendRequest(req.user.id, addressee_id);
-  
+
   res.status(201).json({
     status: 'success',
     data: {
-      friendship
+      friendship,
     },
-    message: 'Friend request sent successfully'
+    message: 'Friend request sent successfully',
   });
 });
 
@@ -34,15 +34,15 @@ const sendFriendRequest = catchAsync(async (req, res) => {
  */
 const acceptFriendRequest = catchAsync(async (req, res) => {
   const { request_id } = req.params;
-  
+
   const friendship = await friendService.acceptFriendRequest(request_id, req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      friendship
+      friendship,
     },
-    message: 'Friend request accepted'
+    message: 'Friend request accepted',
   });
 });
 
@@ -51,15 +51,15 @@ const acceptFriendRequest = catchAsync(async (req, res) => {
  */
 const rejectFriendRequest = catchAsync(async (req, res) => {
   const { request_id } = req.params;
-  
+
   const friendship = await friendService.rejectFriendRequest(request_id, req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      friendship
+      friendship,
     },
-    message: 'Friend request rejected'
+    message: 'Friend request rejected',
   });
 });
 
@@ -72,20 +72,20 @@ const blockUser = catchAsync(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       status: 'error',
-      errors: errors.array()
+      errors: errors.array(),
     });
   }
-  
+
   const { user_id } = req.body;
-  
+
   const friendship = await friendService.blockUser(req.user.id, user_id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      friendship
+      friendship,
     },
-    message: 'User blocked successfully'
+    message: 'User blocked successfully',
   });
 });
 
@@ -94,12 +94,12 @@ const blockUser = catchAsync(async (req, res) => {
  */
 const unblockUser = catchAsync(async (req, res) => {
   const { user_id } = req.params;
-  
+
   await friendService.unblockUser(req.user.id, user_id);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'User unblocked successfully'
+    message: 'User unblocked successfully',
   });
 });
 
@@ -108,12 +108,12 @@ const unblockUser = catchAsync(async (req, res) => {
  */
 const removeFriend = catchAsync(async (req, res) => {
   const { friend_id } = req.params;
-  
+
   await friendService.removeFriend(req.user.id, friend_id);
-  
+
   res.status(200).json({
     status: 'success',
-    message: 'Friend removed successfully'
+    message: 'Friend removed successfully',
   });
 });
 
@@ -123,17 +123,17 @@ const removeFriend = catchAsync(async (req, res) => {
 const getFriends = catchAsync(async (req, res) => {
   const limit = parseInt(req.query.limit) || 20;
   const offset = parseInt(req.query.offset) || 0;
-  
+
   const friends = await friendService.getUserFriends(req.user.id, limit, offset);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       friends,
       count: friends.length,
       limit,
-      offset
-    }
+      offset,
+    },
   });
 });
 
@@ -142,13 +142,13 @@ const getFriends = catchAsync(async (req, res) => {
  */
 const getPendingRequests = catchAsync(async (req, res) => {
   const requests = await friendService.getPendingFriendRequests(req.user.id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       requests,
-      count: requests.length
-    }
+      count: requests.length,
+    },
   });
 });
 
@@ -157,15 +157,15 @@ const getPendingRequests = catchAsync(async (req, res) => {
  */
 const getFriendSuggestions = catchAsync(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
-  
+
   const suggestions = await friendService.getFriendSuggestions(req.user.id, limit);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
       suggestions,
-      count: suggestions.length
-    }
+      count: suggestions.length,
+    },
   });
 });
 
@@ -174,14 +174,14 @@ const getFriendSuggestions = catchAsync(async (req, res) => {
  */
 const getFriendshipStatus = catchAsync(async (req, res) => {
   const { user_id } = req.params;
-  
+
   const status = await friendService.getFriendshipStatus(req.user.id, user_id);
-  
+
   res.status(200).json({
     status: 'success',
     data: {
-      status
-    }
+      status,
+    },
   });
 });
 
@@ -195,5 +195,5 @@ module.exports = {
   getFriends,
   getPendingRequests,
   getFriendSuggestions,
-  getFriendshipStatus
+  getFriendshipStatus,
 };
