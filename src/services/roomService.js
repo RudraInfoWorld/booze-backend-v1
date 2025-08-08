@@ -487,7 +487,7 @@ const createJoinRequest = async (userId, roomId) => {
     // Get user info for notification
     const [user] = await db.query('SELECT username FROM users WHERE id = ?', [userId]);
 
-    // TODO : Send notification to addressee
+    // @FIRE: Send notification to addressee
 
     // Notify room host
     // await notificationService.createNotification({
@@ -554,7 +554,7 @@ const updateJoinRequest = async (requestId, accept) => {
     if (accept) {
       // Get room info
       const [room] = await db.query('SELECT name FROM rooms WHERE id = ?', [request.room_id]);
-      // TODO : Send notification to addressee
+      // @FIRE : Send notification to addressee
 
       // // Notify user
       // await notificationService.createNotification({

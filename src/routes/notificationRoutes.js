@@ -34,14 +34,14 @@ router.put('/read-all', notificationController.markAllNotificationsRead);
  * @desc Delete notification
  * @access Private
  */
-router.delete('/:notification_id', notificationController.deleteNotification);
+router.delete('/:notification_id', notificationController.deleteNotification); // @SKIPTEST
 
 /**
  * @route DELETE /api/notifications
  * @desc Delete all notifications
  * @access Private
  */
-router.delete('/', notificationController.deleteAllNotifications);
+router.delete('/', notificationController.deleteAllNotifications); // @SKIPTEST
 
 /**
  * @route GET /api/notifications/settings
@@ -73,6 +73,7 @@ router.put(
  * @access Private
  */
 router.post(
+  // @SKIPTEST
   '/device-token',
   [
     body('device_token').notEmpty().withMessage('Device token is required'),
@@ -91,6 +92,7 @@ router.post(
  * @access Private
  */
 router.delete(
+  // @SKIPTEST
   '/device-token',
   [body('device_token').notEmpty().withMessage('Device token is required')],
   notificationController.unregisterDeviceToken
