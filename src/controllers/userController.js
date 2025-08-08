@@ -190,6 +190,34 @@ const searchUsers = catchAsync(async (req, res) => {
   });
 });
 
+/**
+ * Mark user as admin
+ */
+const markUserAsAdmin = catchAsync(async (req, res) => {
+  const { userId, isAdmin } = req.params;
+
+  // Validate input
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: 'error',
+      errors: errors.array(),
+    });
+  }
+
+  await userService.markUserAsAdmin(userId, isAdmin);
+
+  const updatedUser = await userService.getUserById(userId);
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+    message: 'User marked as admin successfully',
+  });
+});
+
 module.exports = {
   getProfile,
   getUserByUsername,
@@ -200,4 +228,5 @@ module.exports = {
   updateAccountStatus,
   deleteAccount,
   searchUsers,
+  markUserAsAdmin,
 };

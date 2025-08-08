@@ -18,7 +18,7 @@ const getUserById = async (userId) => {
   try {
     const [user] = await db.query(
       `SELECT id, phone, email, username, bio, profile_picture, interests, 
-      vibe_preference, account_status, mode_preference, created_at
+      vibe_preference, account_status, mode_preference,is_admin, created_at
       FROM users WHERE id = ? AND account_status != 'deleted'`,
       [userId]
     );
@@ -258,6 +258,26 @@ const searchUsers = async (searchTerm, limit = 10) => {
   }
 };
 
+/**
+ * Mark user as admin
+ * @param {string} userId
+ * @param {boolean} isAdmin
+ * @returns {Promise<boolean>} - Success status
+ */
+const markUserAsAdmin = async (userId, isAdmin) => {
+  try {
+    const isAdminValue = isAdmin == 'true' ? 1 : 0;
+    const updatedUser = await db.query('UPDATE users SET is_admin = ? WHERE id = ?', [
+      isAdminValue,
+      userId,
+    ]);
+    return updatedUser;
+  } catch (error) {
+    logger.error(`Mark user as admin error: ${error.message}`);
+    throw new AppError('Failed to mark user as admin', 500);
+  }
+};
+
 module.exports = {
   getUserById,
   getUserByUsername,
@@ -267,4 +287,5 @@ module.exports = {
   updateAccountStatus,
   deleteAccount,
   searchUsers,
+  markUserAsAdmin,
 };

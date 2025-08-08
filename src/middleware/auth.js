@@ -50,7 +50,6 @@ const authenticate = async (req, res, next) => {
       username: user.username,
       status: user.account_status,
     };
-
     next();
   } catch (error) {
     logger.error(`Authentication error: ${error.message}`);
@@ -81,7 +80,28 @@ const authorize = (...roles) => {
   };
 };
 
+/**
+ * Check if user is admin
+ */
+const authorizeAdmin = async (req, res, next) => {
+  try {
+    const [is_user_admin] = await db.query('SELECT is_admin FROM users WHERE id = ?', [
+      req.user.id,
+    ]);
+
+    if (!is_user_admin?.is_admin || is_user_admin?.is_admin == 0) {
+      return next(new AppError('You do not have permission to perform this action', 403));
+    }
+
+    next();
+  } catch (error) {
+    logger.error(`Authorization error: ${error.message}`);
+    return next(new AppError('Authorization failed', 403));
+  }
+};
+
 module.exports = {
   authenticate,
   authorize,
+  authorizeAdmin,
 };

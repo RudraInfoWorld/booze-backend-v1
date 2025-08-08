@@ -69,7 +69,7 @@ const setupDatabase = async () => {
         bio TEXT,
         profile_picture VARCHAR(255),
         pic_id VARCHAR(36),
-        role ENUM('super_admin', 'admin', 'user') DEFAULT 'user',
+        is_admin BOOLEAN DEFAULT FALSE,
         interests JSON,
         vibe_preference VARCHAR(50),
         account_status ENUM('active', 'ghost', 'private', 'deleted') DEFAULT 'active',
