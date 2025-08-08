@@ -245,7 +245,7 @@ const getUserNotifications = async (userId, limit = 20, offset = 0, unreadOnly =
     // Parse data field
     return notifications.map((n) => ({
       ...n,
-      data: JSON.parse(n.data || '{}'),
+      data: typeof n.data === 'string' ? JSON.parse(n.data) : n.data || {},
     }));
   } catch (error) {
     logger.error(`Get user notifications error: ${error.message}`);

@@ -64,7 +64,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/friends', friendRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/games', gameRoutes);
-app.use('/api/notifications', notificationRoutes); // TODO : `Test` skipped due to device token not available
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/media', mediaRoutes);
 
